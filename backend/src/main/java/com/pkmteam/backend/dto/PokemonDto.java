@@ -15,5 +15,6 @@ public class PokemonDto {
     private Integer weight;
     private Integer baseExperience;
     private String spriteRef;
+    private String spriteUrl;
     private List<String> types;
 }

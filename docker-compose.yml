@@ -1,6 +1,7 @@
 version: '3.8'
 volumes:
   test_data:
+  node_modules:
 
 services:
   db:
@@ -47,6 +48,6 @@ services:
       - "4200:4200"
     volumes:
       - ./frontend/src:/usr/src/app/src:cached
-      - /usr/src/app/node_modules
+      - node_modules:/usr/src/app/node_modules
     depends_on:
       - backend

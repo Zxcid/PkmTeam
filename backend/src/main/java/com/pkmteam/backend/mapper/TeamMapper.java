@@ -4,6 +4,7 @@ import com.pkmteam.backend.db.entity.TeamPokemonEntity;
 import com.pkmteam.backend.db.entity.UserTeamEntity;
 import com.pkmteam.backend.dto.PokemonDto;
 import com.pkmteam.backend.dto.TeamDto;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -14,23 +15,18 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = PokemonMapper.class)
 public interface TeamMapper {
-
-    TeamMapper INSTANCE = Mappers.getMapper(TeamMapper.class);
-
-    @Mapping(target = "teamMembers", source = "teamMembers", qualifiedByName = "mapTeamMembers")
+    @Mapping(target = "teamMembers", source = "teamMembers")
     TeamDto userTeamEntityToTeamDto(UserTeamEntity entity);
 
-    @Named("mapTeamMembers")
-    default List<PokemonDto> mapTeamMembers(List<TeamPokemonEntity> teamMembers) {
-        PokemonMapper pokemonMapper = INSTANCE.getPokemonMapper();
-
-        return teamMembers.stream()
-                .map(teamPokemonEntity -> pokemonMapper.pokemonEntityToPokemonDto(teamPokemonEntity.getPokemon()))
-                .collect(Collectors.toList());
+    /**
+     * This method let mapstruct know how to convert a TeamPokemonEntity into a PokemonDto.
+     * This is useful in order to let mapstruct use the PokemonMapper class automatically, without having to inject it.
+     */
+    default PokemonDto mapTeamPokemonEntityToPokemonDto(TeamPokemonEntity teamMember) {
+        return pokemonMapper().pokemonEntityToPokemonDto(teamMember.getPokemon());
     }
 
-    // Metodo per ottenere un'istanza di PokemonMapper (injected automaticamente da MapStruct quando usi componentModel = "spring")
-    default PokemonMapper getPokemonMapper() {
-        return Mappers.getMapper(PokemonMapper.class);
+    default PokemonMapper pokemonMapper() {
+        throw new UnsupportedOperationException("This method should be implemented by MapStruct at runtime.");
     }
 }

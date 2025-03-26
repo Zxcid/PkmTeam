@@ -1,4 +1,4 @@
-import { env } from 'process';
+const env = (window as any).__env__ || {};
 
 export const environment = {
   production: false,

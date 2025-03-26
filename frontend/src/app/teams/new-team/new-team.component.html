@@ -25,7 +25,7 @@
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onPokemonSelected($event)">
             <mat-option *ngFor="let pokemon of pokemonList | async" [value]="pokemon">
               <div class="d-flex align-items-center">
-                <img [src]="pokemon.spriteUrl" alt="{{pokemon.name | transloco}}" width="60" height="60">
+                <img [src]="pokemon.spriteUrl" width="60" height="60">
                 {{(pokemon.name | transloco) | titlecase}}
               </div>
             </mat-option>

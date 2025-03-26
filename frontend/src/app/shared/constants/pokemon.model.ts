@@ -6,6 +6,6 @@ export interface IPokemon {
     weight: number,
     baseExperience: number,
     spriteRef: string,
-    spriteUrl?: string,
+    spriteUrl: string,
     types: string[]
 }

@@ -2,7 +2,7 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { debounceTime, distinctUntilChanged, finalize, forkJoin, from, map, Observable, of, startWith, Subject, switchMap, tap } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, finalize, forkJoin, from, map, Observable, of, startWith, Subject, switchMap, tap } from "rxjs";
 import { ESpinnerType } from 'src/app/shared/constants/app.constants';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { IPokemon } from "../../shared/constants/pokemon.model";
@@ -50,24 +50,17 @@ export class NewTeamComponent implements OnInit, OnDestroy {
       .pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        switchMap((pkmName: string) =>
-          this.pkmService.searchPokemonAutocomplete(pkmName)
+        tap(() => this.spinner.show(ESpinnerType.POKE)),
+        switchMap((pkmName: string) => {
+          return this.pkmService.searchPokemonAutocomplete(pkmName)
             .pipe(
-              tap(() => this.spinner.show(ESpinnerType.POKE)),
-              switchMap((pokemons: IPokemon[]) => {
-                if (!pokemons.length)
-                  return of([]);
-
-                const pokemonWithImages$ = pokemons.map((pokemon) =>
-                  from(getDownloadURL(ref(this.storage, pokemon.spriteRef))).pipe(
-                    map((url) => ({ ...pokemon, spriteUrl: url }))
-                  )
-                );
-                return forkJoin(pokemonWithImages$);
+              catchError(error => {
+                console.error('Error fetching Pokémon:', error);
+                return of([]);
               }),
               finalize(() => this.spinner.hide())
             )
-        )
+        })
       );
   }
 
