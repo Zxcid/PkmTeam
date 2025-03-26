@@ -1,0 +1,31 @@
+<mat-toolbar color="primary" class="d-flex justify-content-between h-60px fixed-top z-2">
+  <div class="d-flex align-items-center">
+    <button *ngIf="!!user" mat-icon-button (click)="snavToggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>PkmTeam</span>
+  </div>
+  <div>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <img *ngIf="user else person" ngSrc="{{user.img}}" fill style="border-radius: 50%">
+      <ng-template #person>
+        <mat-icon>person</mat-icon>
+      </ng-template>
+    </button>
+    <mat-menu #menu="matMenu">
+      <div class="h-30px d-flex justify-content-evenly align-items-center">
+        <ng-container *ngFor="let lang of languages">
+          <button mat-mini-fab class="c-pointer no-shadow" style="background: transparent;" (click)="changeLanguage(lang)">
+            <img src="/assets/img/{{lang}}.png" height="20" width="20">
+          </button>
+        </ng-container>
+      </div>
+      <ng-container *ngIf="user">
+        <button mat-menu-item (click)="onLogout()">
+          <mat-icon class="color-warn">logout</mat-icon>
+          <span class="color-warn">Logout</span>
+        </button>
+      </ng-container>
+    </mat-menu>
+  </div>
+</mat-toolbar>

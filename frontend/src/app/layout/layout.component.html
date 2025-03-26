@@ -1,0 +1,27 @@
+<app-toolbar [user]="user" (snavToggled)="snav.toggle()" (logout)="onLogout()"></app-toolbar>
+
+<div class="h-100">
+  <mat-sidenav-container class="h-100">
+    <mat-sidenav mode="side" #snav [opened]="!!user" class="mt-60px w-20">
+      <div>
+        <h4 class="pt-10px ps-10px">Your teams</h4>
+          <mat-nav-list>
+            <ng-container *ngIf="!!teams">
+              <mat-list-item *ngFor="let team of teams">
+                <div matListItemTitle>{{ team.name }}</div>
+              </mat-list-item>
+            </ng-container>
+            <mat-list-item class="bg-a-100">
+              <div class="d-flex justify-content-between" (click)="onNavigateToNewTeam()">
+                Add new team
+                <mat-icon>add</mat-icon>
+              </div>
+            </mat-list-item>
+          </mat-nav-list>
+      </div>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

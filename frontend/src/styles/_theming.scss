@@ -1,0 +1,136 @@
+//@use '@angular/material' as mat;
+//
+//$my-palette: mat.$indigo-palette;
+
+$themeColors: (
+  'a-100': #ffe57f,
+  'a-200': #ffd740,
+  'a-400': #ffc400,
+  'p-500': #673ab7,
+  't-light': white,
+  't-disabled-light': rgba(white, 0.5),
+  'divider-light': rgba(white, 0.12),
+  't-dark': rgba(black, 0.87),
+  't-disabled-dark': rgba(black, 0.38),
+  'divider-dark': rgba(black, 0.12),
+  'warn': #f44336,
+  't-warn': #ff1744,
+  // Yellow
+  'yellow-1': #cea716, 
+  // Orange
+  'orange-1': #FFDC99,
+  'orange-2': #F3B938,
+  'orange-3': #CF4444,
+  'orange-4': #f18b37,
+  // Green
+  'green-1': #6BFBCE,
+  'green-2': #36A136,
+  'green-3': #82c683,
+  'green-4': #38A13D, 
+  'green-5': #B5D1A0,
+  'green-6': #288684,
+  // Red
+  'red-1': #B91C1C,
+  'red-2': #CF4444,
+  'red-3': #E58888,
+  //Types color
+  'normal': #aaaa99,
+  'fire': #ff4422,
+  'water': #3399ff,
+  'electric': #ffcc33,
+  'grass': #77cc55,
+  'ice': #66ccff,
+  'fighting': #bb5544,
+  'poison': #aa5599,
+  'ground': #ddbb55,
+  'flying': #8899ff,
+  'psychic': #fe5599,
+  'bug': #aabb22,
+  'rock': #bbaa66,
+  'ghost': #6666bb,
+  'dragon': #7766ee,
+  'dark': #775544,
+  'steel': #aaaabb,
+  'fairy': #ee99ee
+);
+
+@each $color, $i in $themeColors {
+
+  /** ------- Text Color classes -------
+  * Usage:
+  * color-<name of color> from $themeColours
+  *
+  * Example:
+  * class="color-a-100" (is the same as color: #ffe57f)
+  */
+  .color {
+    &-#{$color} {
+      color: $i !important;
+    }
+
+    &-hover-#{$color} {
+
+      transition: 0.3s;
+
+      &:hover {
+        color: $i !important;
+      }
+    }
+  }
+
+  /** -------  Background classes -------
+  * Usage:
+  * bg-<name of color> from $themeColours
+  *
+  * Example:
+  * class="color-a-100" (is the same as background: #ffe57f)
+  */
+  .bg {
+    &-#{$color} {
+      background: $i !important;
+    }
+
+    &-hover-#{$color} {
+
+      transition: 0.3s;
+
+      &:hover {
+        background: $i !important;
+      }
+    }
+  }
+
+  /** ------- Border classes -------
+  * Usage:
+  * border-<name of color> from $themeColours
+  *
+  * Example:
+  * class="border-a-100" (is the same as border-color: #ffe57f)
+  *
+  * Note:
+  * Should be combined with a border width and a border style.
+  */
+  .border {
+    &-#{$color} {
+      border-color: $i !important;
+    }
+  }
+}
+
+
+/** ------- Variables -------
+* Usage:
+* In scss
+* @use 'projects/core/src/assets/css/variables' as var;
+*
+* and use
+* var.color(<name of colour>)
+*
+* Example:
+* .class-example {
+*   color: var.color(pink)
+* }
+*/
+@function color($color) {
+  @return map-get($themeColors, $color);
+}

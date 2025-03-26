@@ -1,0 +1,52 @@
+version: '3.8'
+volumes:
+  test_data:
+
+services:
+  db:
+    container_name: db
+    image: 'postgres:16-alpine'
+    profiles:
+      - dev
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=pa55word
+    ports:
+      - "5432:5432"
+    volumes:
+      - test_data:/var/lib/postgresql/data/
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    image: backend
+    env_file:
+      - ./backend/.env
+    profiles:
+      - dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend/:/workspace/
+    links:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    env_file:
+      - ./frontend/.env
+    profiles:
+      - dev
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend/src:/usr/src/app/src:cached
+      - /usr/src/app/node_modules
+    depends_on:
+      - backend

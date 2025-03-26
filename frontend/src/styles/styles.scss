@@ -1,0 +1,590 @@
+@use "./_theming.scss" as var;
+
+@import "./reset.scss";
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f5f5f5;
+}
+
+//#region - General HTML tags
+h {
+  &1 {
+    font-size: 36px !important;
+  }
+
+  &2 {
+    font-size: 32px !important;
+  }
+
+  &3 {
+    font-size: 28px !important;
+  }
+
+  &4 {
+    font-size: 24px !important;
+  }
+}
+
+p {
+  font-size: 16px;
+  line-height: 18px;
+}
+
+//#endregion
+
+//#region - Angular Material
+.mat-drawer-inner-container {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+.snackbar {
+  &-success.mat-mdc-snack-bar-container {
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-container-color: transparent;
+    background-color: var.color(green-2);
+
+    button {
+      color: #fff;
+      transition: all .3s ease;
+
+      &:hover {
+        background-color: var.color(green-3);
+        transition: all .3s ease;
+      }
+    }
+  }
+
+  &-error.mat-mdc-snack-bar-container {
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-container-color: transparent;
+    background-color: var.color(red-1);
+
+    button {
+      transition: all .3s ease;
+
+      &:hover {
+        background-color: var.color(red-2);
+        transition: all .3s ease;
+      }
+    }
+  }
+
+  &-warning.mat-mdc-snack-bar-container {
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-container-color: transparent;
+    background-color: var.color(yellow-1);
+
+    button {
+      color: #fff;
+      transition: all .3s ease;
+
+      &:hover {
+        background-color: var.color(yellow-1);
+        transition: all .3s ease;
+      }
+    }
+  }
+}
+
+//#endregion
+
+//#region - Collection of global classes
+
+/* Width options */
+.w {
+  @for $i from 1 through 100 {
+    &-#{$i} {
+      width: #{$i}+'%';
+    }
+  }
+
+  @for $i from 1 through 9999 {
+    &-#{$i}px {
+      width: #{$i}+'px';
+    }
+  }
+}
+
+/* Height options */
+.h {
+  @for $i from 1 through 100 {
+    &-#{$i} {
+      height: #{$i}+'%';
+    }
+  }
+
+  @for $i from 1 through 9999 {
+    &-#{$i}px {
+      height: #{$i}+'px';
+    }
+  }
+}
+
+/* Z-index options */
+.z {
+  @for $i from 1 through 9999 {
+    &-#{$i} {
+      z-index: #{$i};
+    }
+  }
+}
+
+/* Position options */
+.fixed {
+  &-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  &-top-right {
+    position: fixed;
+    top: 0;
+    right: 0;
+  }
+
+  &-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+  }
+
+  &-bottom-right {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+/* Display options */
+.d {
+  &-flex {
+    display: flex;
+  }
+
+  &-block {
+    display: block;
+  }
+}
+
+/* Flex options */
+.flex {
+  &-column {
+    flex-direction: column;
+
+    &-rev {
+      flex-direction: column-reverse;
+    }
+  }
+
+  &-row {
+    flex-direction: row;
+
+    &-rev {
+      flex-direction: row-reverse;
+    }
+  }
+
+  &-wrap {
+    flex-wrap: wrap;
+  }
+}
+
+/* Gap options */
+.gap {
+  @for $i from 1 through 9999 {
+    &-#{$i} {
+      gap: #{$i}+'px';
+    }
+  }
+
+  &-row {
+    @for $i from 1 through 9999 {
+      &-#{$i} {
+        row-gap: #{$i}+'px';
+      }
+    }
+  }
+
+  &-col {
+    @for $i from 1 through 9999 {
+      &-#{$i} {
+        column-gap: #{$i}+'px';
+      }
+    }
+  }
+}
+
+/* Align options */
+.align {
+  &-content {
+    &-start {
+      align-content: start;
+    }
+
+    &-end {
+      align-content: end;
+    }
+
+    &-center {
+      align-content: center;
+    }
+
+    &-space-around {
+      align-content: space-around;
+    }
+
+    &-space-between {
+      align-content: space-between;
+    }
+  }
+
+  &-items {
+    &-start {
+      align-items: start;
+    }
+
+    &-end {
+      align-items: end;
+    }
+
+    &-center {
+      align-items: center;
+    }
+  }
+
+  &-self {
+    &-start {
+      align-self: self-start;
+    }
+
+    &-end {
+      align-self: self-end;
+    }
+
+    &-center {
+      align-self: center;
+    }
+  }
+}
+
+/* Justify options */
+.justify {
+  &-content {
+    &-start {
+      justify-content: start;
+    }
+
+    &-end {
+      justify-content: end;
+    }
+
+    &-center {
+      justify-content: center;
+    }
+
+    &-around {
+      justify-content: space-around;
+    }
+
+    &-between {
+      justify-content: space-between;
+    }
+
+    &-evenly {
+      justify-content: space-evenly;
+    }
+  }
+
+  &-items {
+    &-start {
+      justify-items: start;
+    }
+
+    &-end {
+      justify-items: end;
+    }
+
+    &-center {
+      justify-items: center;
+    }
+  }
+
+  &-self {
+    &-start {
+      justify-self: start;
+    }
+
+    &-end {
+      justify-self: end;
+    }
+
+    &-center {
+      justify-self: center;
+    }
+  }
+}
+
+/* Margin options */
+.m {
+  &s-auto {
+    margin-left: auto;
+  }
+
+  &x-auto {
+    margin: 0 auto;
+  }
+
+  @for $i from 1 through 10 {
+    &-#{$i} {
+      margin: #{$i}rem;
+    }
+
+    &s {
+      &-#{$i} {
+        margin-left: #{$i}rem;
+      }
+    }
+
+    &t {
+      &-#{$i} {
+        margin-top: #{$i}rem;
+      }
+    }
+
+    &e {
+      &-#{$i} {
+        margin-right: #{$i}rem;
+      }
+    }
+
+    &b {
+      &-#{$i} {
+        margin-bottom: #{$i}rem;
+      }
+    }
+
+    &x {
+      &-#{$i} {
+        margin: 0 #{$i}rem;
+      }
+    }
+
+    &y {
+      &-#{$i} {
+        margin: #{$i}rem 0;
+      }
+    }
+  }
+
+  @for $i from 1 through 9999 {
+    &-#{$i}px {
+      margin: #{$i}+'px';
+    }
+
+    &s {
+      &-#{$i}px {
+        margin-left: #{$i}+'px';
+      }
+    }
+
+    &t {
+      &-#{$i}px {
+        margin-top: #{$i}+'px';
+      }
+    }
+
+    &e {
+      &-#{$i}px {
+        margin-right: #{$i}+'px';
+      }
+    }
+
+    &b {
+      &-#{$i}px {
+        margin-bottom: #{$i}+'px';
+      }
+    }
+
+    &x {
+      &-#{$i}px {
+        margin: 0 #{$i}+'px';
+      }
+    }
+
+    &y {
+      &-#{$i}px {
+        margin: #{$i}+'px' 0;
+      }
+    }
+  }
+}
+
+/* Padding options */
+.p {
+  @for $i from 1 through 10 {
+    &-#{$i} {
+      padding: #{$i}rem;
+    }
+
+    &s {
+      &-#{$i} {
+        padding-left: #{$i}rem;
+      }
+    }
+
+    &t {
+      &-#{$i} {
+        padding-top: #{$i}rem;
+      }
+    }
+
+    &e {
+      &-#{$i} {
+        padding-right: #{$i}rem;
+      }
+    }
+
+    &b {
+      &-#{$i} {
+        padding-bottom: #{$i}rem;
+      }
+    }
+
+    &x {
+      &-#{$i} {
+        padding: 0 #{$i}rem;
+      }
+    }
+
+    &y {
+      &-#{$i} {
+        padding: #{$i}rem 0;
+      }
+    }
+  }
+
+  @for $i from 1 through 9999 {
+    &-#{$i}px {
+      padding: #{$i}+'px';
+    }
+
+    &s {
+      &-#{$i}px {
+        padding-left: #{$i}+'px';
+      }
+    }
+
+    &t {
+      &-#{$i}px {
+        padding-top: #{$i}+'px';
+      }
+    }
+
+    &e {
+      &-#{$i}px {
+        padding-right: #{$i}+'px';
+      }
+    }
+
+    &b {
+      &-#{$i}px {
+        padding-bottom: #{$i}+'px';
+      }
+    }
+
+    &x {
+      &-#{$i}px {
+        padding: 0 #{$i}+'px';
+      }
+    }
+
+    &y {
+      &-#{$i}px {
+        padding: #{$i}+'px' 0;
+      }
+    }
+  }
+}
+
+/* Cursor options */
+.c {
+  &-pointer {
+    cursor: pointer;
+  }
+}
+
+/* Text options */
+.text {
+  &-center {
+    text-align: center;
+  }
+
+  &-start {
+    text-align: start;
+  }
+
+  &-end {
+    text-align: end;
+  }
+}
+
+/* Font options */
+.font {
+  @for $i from 1 to 100 {
+    &-#{$i} {
+      font-size: #{$i}px !important;
+    }
+  }
+
+  &-bold {
+    font-weight: bold;
+  }
+}
+
+/* Box Shadow options */
+.no-shadow {
+  box-shadow: none !important;
+}
+
+/* Overflow options */
+.overflow {
+  &-auto {
+    overflow: auto;
+  }
+
+  &-scroll {
+    overflow: scroll;
+
+    &-y {
+      overflow-y: scroll;
+    }
+
+    &-x {
+      overflow-x: scroll;
+    }
+  }
+}
+
+/* Border options */
+.border {
+  &-none {
+    border: none;
+  }
+}
+
+//#endregion
