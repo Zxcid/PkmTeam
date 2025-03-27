@@ -1,13 +1,15 @@
 <mat-toolbar color="primary" class="d-flex justify-content-between h-60px fixed-top z-2">
   <div class="d-flex align-items-center">
-    <button *ngIf="!!user" mat-icon-button (click)="snavToggle()">
+    <button *ngIf="authService.user$ | async as user" mat-icon-button (click)="snavToggle()">
       <mat-icon>menu</mat-icon>
     </button>
     <span>PkmTeam</span>
   </div>
   <div>
     <button mat-icon-button [matMenuTriggerFor]="menu">
-      <img *ngIf="user else person" ngSrc="{{user.img}}" fill style="border-radius: 50%">
+      <ng-container *ngIf="authService.user$ | async as user; else person">
+        <img ngSrc="{{user.img}}" fill style="border-radius: 50%">
+      </ng-container>
       <ng-template #person>
         <mat-icon>person</mat-icon>
       </ng-template>
@@ -20,7 +22,7 @@
           </button>
         </ng-container>
       </div>
-      <ng-container *ngIf="user">
+      <ng-container *ngIf="authService.user$ | async as user">
         <button mat-menu-item (click)="onLogout()">
           <mat-icon class="color-warn">logout</mat-icon>
           <span class="color-warn">Logout</span>

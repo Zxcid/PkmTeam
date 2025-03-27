@@ -1,8 +1,9 @@
-<app-toolbar [user]="user" (snavToggled)="snav.toggle()" (logout)="onLogout()"></app-toolbar>
+<app-toolbar (snavToggled)="snav.toggle()"></app-toolbar>
 
 <div class="h-100">
   <mat-sidenav-container class="h-100">
-    <mat-sidenav mode="side" #snav [opened]="!!user" class="mt-60px w-20">
+    <!-- TODO show sidenav or remove it!!! -->
+    <mat-sidenav mode="side" #snav [opened]="true" class="mt-60px w-20">
       <div>
         <h4 class="pt-10px ps-10px">Your teams</h4>
           <mat-nav-list>

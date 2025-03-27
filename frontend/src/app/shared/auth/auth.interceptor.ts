@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Auth, user } from '@angular/fire/auth';
-import { from, Observable, switchMap } from 'rxjs';
+import { from, Observable, switchMap, take } from 'rxjs';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -15,9 +15,11 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return user(this.auth).pipe(
+      take(1),
       switchMap(firebaseUser => {
         if (firebaseUser) {
           return from(firebaseUser.getIdToken()).pipe(
+            take(1),
             switchMap(token => {
               const cloned = request.clone({
                 setHeaders: {

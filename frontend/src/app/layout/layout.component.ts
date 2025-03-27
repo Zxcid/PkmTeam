@@ -19,36 +19,18 @@ export class LayoutComponent implements OnInit, OnDestroy {
   teams!: ITeam[];
 
   constructor(
-    private auth: AuthService,
     private teamsService: TeamsService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private router: Router
   ) {
   }
 
   ngOnInit(): void {
-    this.auth.user$
-      .pipe(
-        takeUntil(this.destroy$),
-        distinctUntilChanged((prev, curr) => 
-          prev?.uid === curr?.uid && prev?.role === curr?.role // Confronto sicuro
-        )
-      )
-      .subscribe((user: IUser | null) => {
-        this.user = user ? { ...user } : null;
-        this.cdr.detectChanges();
-      });
-
     this.teamsService.getTeams()
       .pipe(
         take(1),
         filter((teams: ITeam[]) => teams.length > 0)
       )
       .subscribe((teams: ITeam[]) => this.teams = teams);
-  }
-
-  onLogout(): void {
-    this.auth.logout();
   }
 
   onNavigateToNewTeam(): void {
