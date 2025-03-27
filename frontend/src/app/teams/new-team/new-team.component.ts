@@ -51,8 +51,7 @@ export class NewTeamComponent implements OnInit, OnDestroy {
         debounceTime(500),
         distinctUntilChanged(),
         tap(() => this.spinner.show(ESpinnerType.POKE)),
-        switchMap((pkmName: string) => {
-          return this.pkmService.searchPokemonAutocomplete(pkmName)
+        switchMap((pkmName: string) => this.pkmService.searchPokemonAutocomplete(pkmName)
             .pipe(
               catchError(error => {
                 console.error('Error fetching Pokémon:', error);
@@ -60,7 +59,7 @@ export class NewTeamComponent implements OnInit, OnDestroy {
               }),
               finalize(() => this.spinner.hide())
             )
-        })
+        )
       );
   }
 
