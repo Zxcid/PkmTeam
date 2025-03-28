@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable, Optional } from '@angular/core';
 import {
   Auth,
@@ -11,12 +10,11 @@ import {
   user
 } from "@angular/fire/auth";
 import { Router } from "@angular/router";
-import { Observable, catchError, map, of, shareReplay, switchMap } from "rxjs";
-import { environment } from 'src/environments/environment';
+import { Observable, map, of, shareReplay, switchMap } from "rxjs";
 import { AppRoutingBuilder } from "../classes/app-routing-builder";
 import { ESections } from "../constants/routing.constants";
 import { IUser } from "../constants/user.constants";
-import { SnackbarService } from './snackbar.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,8 +28,7 @@ export class AuthService {
   constructor(
     @Optional() private auth: Auth,
     private router: Router,
-    private http: HttpClient,
-    private snackbar: SnackbarService
+    private userService: UserService
   ) {
     this.user$ = this.createUserStream();
   }
@@ -59,17 +56,13 @@ export class AuthService {
     return user(this.auth).pipe(
       switchMap((fbUser: User | null) => {
         if (fbUser) {
-          return this.http.post<IUser>(environment.api.user.login, null)
+          return this.userService.internalLogin()
             .pipe(
               map((backendUser: IUser) => ({
                 uid: fbUser.uid,
                 img: fbUser.photoURL || '',
                 role: backendUser.role
-              })),
-              catchError(err => {
-                this.snackbar.error(err.error);
-                return of(null);
-              })
+              }))
             );
         } else {
           return of(null);

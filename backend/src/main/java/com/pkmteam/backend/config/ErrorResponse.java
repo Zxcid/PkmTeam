@@ -1,6 +1,5 @@
 package com.pkmteam.backend.config;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 

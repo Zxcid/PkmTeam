@@ -1,17 +1,23 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from '@angular/core';
-import { Observable } from "rxjs";
+import { Auth } from "@angular/fire/auth";
+import { Observable, tap } from "rxjs";
 import { environment } from "src/environments/environment";
+import { AbstractAuthenticatedHttpService } from '../auth/abstract-authenticated-http.service';
 import { IPokemon } from "../constants/pokemon.model";
+import { SnackbarService } from "./snackbar.service";
 
 @Injectable({
   providedIn: 'root'
 })
-export class PokemonService {
+export class PokemonService extends AbstractAuthenticatedHttpService {
   
   constructor(
-    private http: HttpClient,
+    http: HttpClient,
+    auth: Auth,
+    snackbar: SnackbarService
   ) {
+    super(http, auth, snackbar);
   }
 
   searchPokemonAutocomplete(name: string): Observable<IPokemon[]> {
@@ -19,7 +25,7 @@ export class PokemonService {
     const params: HttpParams = new HttpParams()
       .append('name', name);
 
-    return this.http.get<IPokemon[]>(url, { params: params });
+    return this.get$<IPokemon[]>(url, params);
   }
 
 

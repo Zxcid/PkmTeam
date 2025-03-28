@@ -17,16 +17,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
     }
 
-    // 404 Not Found
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
-        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
-    }
-
     // 403 Forbidden
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
         return buildErrorResponse(ex, HttpStatus.FORBIDDEN, request);
+    }
+
+    // 404 Not Found
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
     }
 
     // 500 Internal Server Error
@@ -41,6 +41,8 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false).replace("uri=", "")
         );
-        return ResponseEntity.status(status).body(errorResponse);
+        return ResponseEntity
+                .status(status)
+                .body(errorResponse);
     }
 }
