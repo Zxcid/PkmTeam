@@ -1,8 +1,8 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
+import { Storage } from '@angular/fire/storage';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { catchError, debounceTime, distinctUntilChanged, exhaustMap, finalize, forkJoin, from, map, Observable, of, startWith, Subject, switchMap, tap } from "rxjs";
+import { debounceTime, distinctUntilChanged, finalize, Observable, Subject, switchMap } from "rxjs";
 import { ESpinnerType } from 'src/app/shared/constants/app.constants';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { IPokemon } from "../../shared/constants/pokemon.model";
@@ -54,10 +54,6 @@ export class NewTeamComponent implements OnInit, OnDestroy {
           this.spinner.show(ESpinnerType.POKE);
           return this.pkmService.searchPokemonAutocomplete(pkmName)
             .pipe(
-              catchError(error => {
-                console.error('Error fetching Pokémon:', error);
-                return of([]);
-              }),
               finalize(() => this.spinner.hide())
             )
         })

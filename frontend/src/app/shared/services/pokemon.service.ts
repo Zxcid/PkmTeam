@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from '@angular/core';
 import { Auth } from "@angular/fire/auth";
-import { Observable, tap } from "rxjs";
+import { Observable } from "rxjs";
 import { environment } from "src/environments/environment";
 import { AbstractAuthenticatedHttpService } from '../auth/abstract-authenticated-http.service';
 import { IPokemon } from "../constants/pokemon.model";
@@ -11,7 +11,7 @@ import { SnackbarService } from "./snackbar.service";
   providedIn: 'root'
 })
 export class PokemonService extends AbstractAuthenticatedHttpService {
-  
+
   constructor(
     http: HttpClient,
     auth: Auth,
@@ -25,7 +25,7 @@ export class PokemonService extends AbstractAuthenticatedHttpService {
     const params: HttpParams = new HttpParams()
       .append('name', name);
 
-    return this.get$<IPokemon[]>(url, params);
+    return this.get$<IPokemon[]>(url, { params });
   }
 
 

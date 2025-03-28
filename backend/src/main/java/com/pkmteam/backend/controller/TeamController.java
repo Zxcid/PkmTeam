@@ -16,6 +16,7 @@ public class TeamController {
     private final TeamService teamService;
 
     @PostMapping("/save")
+    //TODO get token in auth context, not from header. Now firebase auth is on backend!!
     public ResponseEntity<TeamDto> createOrUpdateTeam(@RequestBody TeamRequestDto request, HttpServletRequest httpServletRequest) {
         String firebaseUid = extractFirebaseUid(httpServletRequest);
         return ResponseEntity.ok(teamService.saveTeam(firebaseUid, request));
