@@ -10,7 +10,6 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 export class ToolbarComponent implements OnInit {
 
   @Output() snavToggled: EventEmitter<any> = new EventEmitter<any>();
-  @Output() logout: EventEmitter<any> = new EventEmitter<any>();
 
   languages: string[] = []
 
@@ -22,7 +21,7 @@ export class ToolbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.languages = this.translocoService.getAvailableLangs() as string[];
-    console.log('available langs: ', this.languages);
+    console.log('available langs: ', this.languages); 
   }
 
   changeLanguage(lang: string) {

@@ -1,10 +1,8 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from "@angular/router";
-import { distinctUntilChanged, filter, Subject, take, takeUntil } from "rxjs";
+import { filter, take } from "rxjs";
 import { ESections } from "../shared/constants/routing.constants";
 import { ITeam } from "../shared/constants/team.model";
-import { IUser } from "../shared/constants/user.constants";
-import { AuthService } from "../shared/services/auth.service";
 import { TeamsService } from "../shared/services/teams.service";
 
 @Component({
@@ -14,8 +12,6 @@ import { TeamsService } from "../shared/services/teams.service";
 })
 export class LayoutComponent implements OnInit, OnDestroy {
 
-  user: IUser | null = null;
-  destroy$: Subject<boolean> = new Subject();
   teams!: ITeam[];
 
   constructor(
@@ -38,7 +34,5 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.complete();
   }
 }

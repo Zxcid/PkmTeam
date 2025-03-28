@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, NgZone, Optional } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
 import {
   Auth,
   GoogleAuthProvider,
@@ -31,10 +31,9 @@ export class AuthService {
     @Optional() private auth: Auth,
     private router: Router,
     private http: HttpClient,
-    private snackbar: SnackbarService,
-    private ngZone: NgZone
+    private snackbar: SnackbarService
   ) {
-    this.user$ = this.ngZone.run(() => this.createUserStream()); //ngZone wrapper is used because angular fire auth stream has the nasty habit to run outside angular zone.
+    this.user$ = this.createUserStream();
   }
 
   login(): void {
