@@ -1,14 +1,15 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { Storage } from '@angular/fire/storage';
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { debounceTime, distinctUntilChanged, finalize, Observable, Subject, switchMap } from "rxjs";
 import { ESpinnerType } from 'src/app/shared/constants/app.constants';
+import { ICreateTeamRequest } from 'src/app/shared/constants/team.model';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
+import { TeamsService } from 'src/app/shared/services/teams.service';
 import { IPokemon } from "../../shared/constants/pokemon.model";
 import { PokemonService } from "../../shared/services/pokemon.service";
-import { TeamsService } from 'src/app/shared/services/teams.service';
-import { ICreateTeamRequest } from 'src/app/shared/constants/team.model';
+import { TeamPokemonForm } from '../constants/form.constants';
+import { teamNameValidator } from 'src/app/shared/validators/team-name.validator';
 
 @Component({
   selector: 'app-new-team',
@@ -16,72 +17,42 @@ import { ICreateTeamRequest } from 'src/app/shared/constants/team.model';
   styleUrls: ['./new-team.component.scss']
 })
 export class NewTeamComponent implements OnInit, OnDestroy {
-  storage: Storage = inject(Storage);
-
-  isTitleEditable: boolean = false;
-  teamMembers: IPokemon[] = [];
+  isTitleEditable = false;
+  teamCount = 0;
   teamForm!: FormGroup;
-  teamCount: number = 0;
 
-  private _teamName!: string;
-  get teamName(): string {
-    return this._teamName;
-  }
-
-  set teamName(value: string) {
-    this._teamName = value;
+  get teamMembers(): FormArray {
+    return this.teamForm.get('teamMembers') as FormArray;
   }
 
   pokemonList!: Observable<IPokemon[]>;
-  pkmSearch$: Subject<string> = new Subject<string>();
-  destroy$: Subject<boolean> = new Subject<boolean>();
+  pkmSearch$ = new Subject<string>();
+  destroy$ = new Subject<boolean>();
 
   constructor(
+    private fb: FormBuilder,
     private pkmService: PokemonService,
     private teamService: TeamsService,
-    private spinner: SpinnerService,
-    private fb: FormBuilder
-  ) {
-  }
+    private spinner: SpinnerService
+  ) { }
 
   ngOnInit(): void {
     this.createForm();
 
-    this.pokemonList = this.pkmSearch$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        switchMap((pkmName: string) => {
-          this.spinner.show(ESpinnerType.POKE);
-          return this.pkmService.searchPokemonAutocomplete(pkmName)
-            .pipe(
-              finalize(() => this.spinner.hide())
-            )
-        })
-      );
+    this.pokemonList = this.pkmSearch$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((pkmName: string) => {
+        this.spinner.show(ESpinnerType.POKE);
+        return this.pkmService.searchPokemonAutocomplete(pkmName).pipe(
+          finalize(() => this.spinner.hide())
+        );
+      })
+    );
   }
 
   toggleIsTitleEditable(): void {
     this.isTitleEditable = !this.isTitleEditable;
-  }
-
-  getTeamName(): string {
-    return !!this.teamName ? this.teamName : `Team #${this.teamCount + 1}`;
-  }
-
-  onSubmit(): void {
-    const teamMembers: number[] = this.teamMembers.map(pk => pk.pkPokemon);
-    const request: ICreateTeamRequest = {
-      teamName: this.getTeamName(),
-      pkPokemons: teamMembers
-    };
-
-    this.spinner.show(ESpinnerType.PIKA);
-    this.teamService.saveTeam(request)
-      .pipe(
-        finalize(() => this.spinner.hide())
-      )
-      .subscribe();
   }
 
   onPkmSearch(event: Event): void {
@@ -91,24 +62,52 @@ export class NewTeamComponent implements OnInit, OnDestroy {
   onPokemonSelected(event: MatAutocompleteSelectedEvent): void {
     if (this.teamMembers.length >= 6) {
       this.teamForm.get('pokemonSearch')?.reset();
-      throw new Error('You can only have 6 pokemon in a team! Please, remove one before adding another.');
+      throw new Error('You can only have 6 Pokémon in a team!');
     }
 
-    const selectedPokemon: IPokemon = event.option.value;
-    this.teamMembers.push(selectedPokemon);
+    const selected: IPokemon = event.option.value;
+
+    const pkmForm = this.fb.group({
+      pkPokemon: [selected.pkPokemon],
+      name: [selected.name],
+      spriteUrl: [selected.spriteUrl],
+      types: [selected.types]
+    });
+
+    this.teamMembers.push(pkmForm);
     this.teamForm.get('pokemonSearch')?.reset();
   }
 
-  onPokemonRemoved(i: number) {
-    this.teamMembers.splice(i, 1);
+  onPokemonRemoved(index: number): void {
+    this.teamMembers.removeAt(index);
   }
 
-  deleteTeam(): void { }
+  onSubmit(): void {
+    const { teamName, teamMembers } = this.teamForm.getRawValue();
+    const request: ICreateTeamRequest = {
+      teamName: teamName,
+      pkPokemons: teamMembers.map((pkm: TeamPokemonForm) => pkm.pkPokemon)
+    };
+
+    this.spinner.show(ESpinnerType.PIKA);
+    this.teamService.saveTeam(request)
+      .pipe(finalize(() => this.spinner.hide()))
+      .subscribe();
+  }
+
+  deleteTeam(): void {
+    // TODO
+  }
 
   private createForm(): void {
     this.teamForm = this.fb.group({
-      teamName: ['', [Validators.required]],
-      pokemonSearch: ['']
+      teamName: ['', {
+        validators: [Validators.required],
+        asyncValidators: [teamNameValidator(this.teamService)],
+        updateOn: 'change' // 'blur'
+      }],
+      pokemonSearch: [''],
+      teamMembers: this.fb.array([])
     });
   }
 
@@ -116,5 +115,4 @@ export class NewTeamComponent implements OnInit, OnDestroy {
     this.destroy$.next(true);
     this.destroy$.unsubscribe();
   }
-
 }

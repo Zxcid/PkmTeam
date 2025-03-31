@@ -16,12 +16,18 @@ export class TeamsService extends AbstractAuthenticatedHttpService {
     super(http, auth, snackbar);
   }
 
-  checkTeamName(teamName: string): Observable<boolean> {
-    return of(true);
+  checkTeamNameAvailability(teamName: string): Observable<boolean> {
+    const url: string = '';
+    return of(false);
   }
 
   saveTeam(team: ICreateTeamRequest): Observable<ITeamDto> {
     const url: string = environment.api.team.save;
     return this.post$(url, team);
+  }
+
+  deleteTeam(team: any): Observable<unknown> {
+    const url: string = '';
+    return this.delete$(url);
   }
 }

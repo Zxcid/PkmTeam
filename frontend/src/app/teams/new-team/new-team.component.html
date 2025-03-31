@@ -1,51 +1,51 @@
-<div id="new-team-wrapper" class="h-100">
-  <form [formGroup]="teamForm" class="h-100" (ngSubmit)="onSubmit()">
-    <div class="h-100 d-flex pt-100px flex-column justify-content-between">
-      <div class="w-100">
-        <h2 class="text-center">
-          {{ getTeamName() }}
-          <!--    <mat-icon class="c-pointer ms-1 color-green">check</mat-icon>-->
-          <mat-icon class="c-pointer ms-1" (click)="toggleIsTitleEditable()">edit</mat-icon>
-        </h2>
-  
-        <mat-form-field *ngIf="isTitleEditable" class="w-100">
-          <mat-label>Team name</mat-label>
-          <input matInput type="text" formControlName="teamName" [(ngModel)]="teamName">
-          <button *ngIf="teamName" matSuffix mat-icon-button (click)="toggleIsTitleEditable()">
-            <mat-icon class="color-green-2">check</mat-icon>
-          </button>
-        </mat-form-field>
-  
-        <mat-form-field class="w-100 pt-20px">
-          <mat-label>Choose a Pokemon for your team!</mat-label>
-          <input matInput type="text" formControlName="pokemonSearch" [matAutocomplete]="auto"
-            (keyup)="onPkmSearch($event)">
-          <app-poke-spinner matSuffix [scale]="0.5"></app-poke-spinner>
-  
-          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onPokemonSelected($event)">
-            <mat-option *ngFor="let pokemon of pokemonList | async" [value]="pokemon">
-              <div class="d-flex align-items-center">
-                <img [src]="pokemon.spriteUrl" width="60" height="60">
-                {{(pokemon.name | transloco) | titlecase}}
-              </div>
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
+<form [formGroup]="teamForm" (ngSubmit)="onSubmit()" class="h-100">
+  <div class="h-100 d-flex pt-100px flex-column justify-content-between">
 
-        <div *ngIf="teamMembers.length > 0">
-          <div class="d-flex flex-wrap justify-content-evenly gap-row-20">
-            <ng-container *ngFor="let member of teamMembers; let i=index">
-              <app-team-member-card [pokemon]="member" (removed)="onPokemonRemoved(i)"></app-team-member-card>
-            </ng-container>
-          </div>
+    <div class="w-100">
+      <h2 class="text-center">
+        {{ teamForm.get('teamName')?.value || 'New Team' }}
+        <mat-icon class="c-pointer ms-1" (click)="toggleIsTitleEditable()">edit</mat-icon>
+      </h2>
+
+      <mat-form-field *ngIf="isTitleEditable" class="w-100">
+        <mat-label>Team name</mat-label>
+        <input matInput formControlName="teamName">
+        <button *ngIf="teamForm.get('teamName')?.value" matSuffix mat-icon-button
+          [disabled]="teamForm.get('teamName')?.invalid" (click)="toggleIsTitleEditable()">
+          <mat-icon class="color-green-2">check</mat-icon>
+        </button>
+        <mat-error *ngIf="teamForm.get('teamName')?.hasError('teamNameTaken')">
+          This team name is already in use.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="w-100 pt-20px">
+        <mat-label>Choose a Pokémon</mat-label>
+        <input matInput formControlName="pokemonSearch" [matAutocomplete]="auto" (keyup)="onPkmSearch($event)">
+        <app-poke-spinner matSuffix [scale]="0.5"></app-poke-spinner>
+
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onPokemonSelected($event)">
+          <mat-option *ngFor="let pokemon of pokemonList | async" [value]="pokemon">
+            <div class="d-flex align-items-center">
+              <img [src]="pokemon.spriteUrl" width="60" height="60">
+              {{ (pokemon.name | transloco) | titlecase }}
+            </div>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <div *ngIf="teamMembers.length > 0">
+        <div class="d-flex flex-wrap justify-content-evenly gap-row-20">
+          <ng-container *ngFor="let control of teamMembers.controls; let i = index">
+            <app-team-member-card [form]="control" (removed)="onPokemonRemoved(i)"></app-team-member-card>
+          </ng-container>
         </div>
       </div>
-  
-  
-      <div class="w-100 d-flex justify-content-end pe-50px pb-50px gap-10">
-        <button mat-stroked-button color="warn" (click)="deleteTeam()">Delete Team</button>
-        <button mat-stroked-button color="primary" type="submit">Save</button>
-      </div>
     </div>
-  </form>
-</div>
+
+    <div class="w-100 d-flex justify-content-end pe-50px pb-50px gap-10">
+      <button mat-stroked-button color="warn" (click)="deleteTeam()">Delete Team</button>
+      <button mat-stroked-button color="primary" type="submit">Save</button>
+    </div>
+  </div>
+</form>

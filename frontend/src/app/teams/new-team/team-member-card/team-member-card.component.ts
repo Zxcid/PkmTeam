@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { IPokemon } from 'src/app/shared/constants/pokemon.model';
+import { AbstractControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-team-member-card',
@@ -7,17 +7,15 @@ import { IPokemon } from 'src/app/shared/constants/pokemon.model';
   styleUrls: ['./team-member-card.component.scss']
 })
 export class TeamMemberCardComponent {
+  @Input() form!: AbstractControl;
+  @Output() removed = new EventEmitter<void>();
 
-  @Input() pokemon!: IPokemon;
-
-  @Output() removed: EventEmitter<void> = new EventEmitter();
-
-  onRemovePokemon() {
+  onRemovePokemon(): void {
     this.removed.emit();
   }
 
   formatTypeName(type: string): string {
     return type.substring(5);
   }
-
 }
+
