@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserTeamRepository extends JpaRepository<UserTeamEntity, Integer> {
     int countByUser_FirebaseUid(String firebaseUid);
+    boolean existsByUser_FirebaseUidAndNameIgnoreCase(String firebaseUid, String name);
 }

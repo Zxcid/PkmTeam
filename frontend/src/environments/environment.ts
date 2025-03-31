@@ -15,7 +15,8 @@ export const environment = {
       login: 'http://localhost:8080/user/login'
     },
     team: {
-      save: 'http://localhost:8080/team/save'
+      save: 'http://localhost:8080/team/save',
+      check_name: 'http://localhost:8080/team/check-name'
     },
     pokemon: 'http://localhost:8080/pokemon'
   }

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { Observable, of } from "rxjs";
@@ -17,8 +17,11 @@ export class TeamsService extends AbstractAuthenticatedHttpService {
   }
 
   checkTeamNameAvailability(teamName: string): Observable<boolean> {
-    const url: string = '';
-    return of(false);
+    const url: string = environment.api.team.check_name;
+    const params: HttpParams = new HttpParams()
+      .append('name', teamName);
+
+    return this.get$(url, { params });
   }
 
   saveTeam(team: ICreateTeamRequest): Observable<ITeamDto> {

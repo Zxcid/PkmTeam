@@ -62,6 +62,10 @@ public class TeamService {
         );
     }
 
+    public boolean checkTeamNameAvailability(String firebaseUid, String teamName) {
+        return !userTeamRepository.existsByUser_FirebaseUidAndNameIgnoreCase(firebaseUid, teamName);
+    }
+
     private List<TeamPokemonEntity> createTeamMembers(UserTeamEntity team, List<PokemonEntity> pokemons) {
         return IntStream.range(0, pokemons.size())
                 .mapToObj(i -> {

@@ -24,4 +24,10 @@ public class TeamController {
                 .status(HttpStatus.CREATED)
                 .body(teamService.createTeam(user.firebaseUid(), request));
     }
+
+    @GetMapping("/check-name")
+    public ResponseEntity<Boolean> checkTeamNameAvailability(@RequestParam String name,
+                                                             @AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.ok(teamService.checkTeamNameAvailability(user.firebaseUid(), name));
+    }
 }
