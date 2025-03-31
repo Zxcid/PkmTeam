@@ -6,8 +6,9 @@ import { debounceTime, distinctUntilChanged, finalize, Observable, Subject, swit
 import { ESpinnerType } from 'src/app/shared/constants/app.constants';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { IPokemon } from "../../shared/constants/pokemon.model";
-import { ITeam } from "../../shared/constants/team.model";
 import { PokemonService } from "../../shared/services/pokemon.service";
+import { TeamsService } from 'src/app/shared/services/teams.service';
+import { ICreateTeamRequest } from 'src/app/shared/constants/team.model';
 
 @Component({
   selector: 'app-new-team',
@@ -20,7 +21,6 @@ export class NewTeamComponent implements OnInit, OnDestroy {
   isTitleEditable: boolean = false;
   teamMembers: IPokemon[] = [];
   teamForm!: FormGroup;
-  team!: ITeam;
   teamCount: number = 0;
 
   private _teamName!: string;
@@ -38,6 +38,7 @@ export class NewTeamComponent implements OnInit, OnDestroy {
 
   constructor(
     private pkmService: PokemonService,
+    private teamService: TeamsService,
     private spinner: SpinnerService,
     private fb: FormBuilder
   ) {
@@ -69,6 +70,18 @@ export class NewTeamComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    const teamMembers: number[] = this.teamMembers.map(pk => pk.pkPokemon);
+    const request: ICreateTeamRequest = {
+      teamName: this.getTeamName(),
+      pkPokemons: teamMembers
+    };
+
+    this.spinner.show(ESpinnerType.PIKA);
+    this.teamService.saveTeam(request)
+      .pipe(
+        finalize(() => this.spinner.hide())
+      )
+      .subscribe();
   }
 
   onPkmSearch(event: Event): void {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ITeam } from '../shared/constants/team.model';
+import { ITeamDto } from '../shared/constants/team.model';
 
 @Component({
   selector: 'app-teams',
@@ -9,7 +9,7 @@ import { ITeam } from '../shared/constants/team.model';
 })
 export class TeamsComponent implements OnInit {
 
-  teams!: Observable<ITeam[]>;
+  teams!: Observable<ITeamDto[]>;
 
   constructor() {}
 

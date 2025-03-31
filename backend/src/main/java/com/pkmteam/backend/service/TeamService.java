@@ -2,63 +2,76 @@ package com.pkmteam.backend.service;
 
 import com.pkmteam.backend.db.entity.*;
 import com.pkmteam.backend.db.repository.PokemonRepository;
-import com.pkmteam.backend.db.repository.TeamRepository;
 import com.pkmteam.backend.db.repository.UserRepository;
-import com.pkmteam.backend.dto.TeamDto;
+import com.pkmteam.backend.db.repository.UserTeamRepository;
 import com.pkmteam.backend.dto.TeamRequestDto;
-import com.pkmteam.backend.mapper.TeamMapper;
+import com.pkmteam.backend.dto.UserTeamDto;
+import com.pkmteam.backend.dto.enums.GlobalConfigKeys;
+import com.pkmteam.backend.mapper.UserTeamMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
+import static com.pkmteam.backend.dto.enums.UserRole.PREMIUM;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TeamService {
 
-    private final TeamRepository teamRepository;
+    private final UserTeamRepository userTeamRepository;
     private final UserRepository userRepository;
     private final PokemonRepository pokemonRepository;
-    private final TeamMapper teamMapper;
+    private final UserTeamMapper userTeamMapper;
+    private final GlobalConfigurationService globalConfigurationService;
 
-    public TeamDto saveTeam(String firebaseUid, TeamRequestDto requestDto) {
+    @Transactional
+    public UserTeamDto createTeam(String firebaseUid, TeamRequestDto request) {
 
         UserEntity user = userRepository.findById(firebaseUid)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with uid: " + firebaseUid));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
-        UserTeamEntity team = teamRepository.findByUserFirebaseUidAndTeamNumber(firebaseUid, requestDto.teamNumber())
-                .orElseGet(() -> {
-                    var newTeam = new UserTeamEntity();
-                    newTeam.setUser(user);
-                    newTeam.setTeamNumber(requestDto.teamNumber());
-                    return newTeam;
-                });
+        int maxTeams = globalConfigurationService.getIntValue(GlobalConfigKeys.BASIC_USER_MAX_TEAMS);
 
-        team.setName(requestDto.teamName());
+        int existingTeams = userTeamRepository.countByUser_FirebaseUid(firebaseUid);
+        if (existingTeams >= maxTeams && !PREMIUM.toString().equalsIgnoreCase(user.getRole().getName()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can have max 3 teams. Upgrade to premium to unlock more!");
 
-        if (requestDto.pokemonIds().size() > 6)
-            throw new IllegalArgumentException("A team can't contain more than 6 pokemon.");
+        List<Integer> pkPokemons = request.pkPokemons();
+        if (pkPokemons.size() > 6)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A team can have no more then 6 pokemon in it!");
 
-        List<TeamPokemonEntity> teamMembers = new ArrayList<>();
-        short slotNumber = 1;
-        for (Integer pokemonId : requestDto.pokemonIds()) {
-            PokemonEntity pokemon = pokemonRepository.findById(pokemonId)
-                    .orElseThrow(() -> new IllegalArgumentException("Pokemon not found with id: " + pokemonId));
+        List<PokemonEntity> pokemons = pokemonRepository.findAllById(pkPokemons);
+        if (pokemons.size() != pkPokemons.size())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "One or more pokemon not found.");
 
-            var teamPokemon = new TeamPokemonEntity();
-            teamPokemon.setId(new TeamPokemonEntityPK(null, slotNumber));
-            teamPokemon.setTeam(team);
-            teamPokemon.setPokemon(pokemon);
+        UserTeamEntity team = userTeamMapper.fromDto(request, user);
 
-            teamMembers.add(teamPokemon);
-            slotNumber++;
-        }
-
-        team.setTeamMembers(teamMembers);
-
-        return teamMapper.userTeamEntityToTeamDto(
-                teamRepository.save(team)
+        team.setTeamMembers(
+                createTeamMembers(team, pokemons)
         );
+
+        return userTeamMapper.userTeamEntityToTeamDto(
+                userTeamRepository.save(team)
+        );
+    }
+
+    private List<TeamPokemonEntity> createTeamMembers(UserTeamEntity team, List<PokemonEntity> pokemons) {
+        return IntStream.range(0, pokemons.size())
+                .mapToObj(i -> {
+                    var memberId = new TeamPokemonEntityPK(0, (short) (i + 1));
+                    var member = new TeamPokemonEntity();
+                    member.setId(memberId);
+                    member.setTeam(team);
+                    member.setPokemon(pokemons.get(i));
+                    return member;
+                })
+                .toList();
     }
 }

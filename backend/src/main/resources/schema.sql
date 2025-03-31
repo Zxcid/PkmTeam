@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS public.global_configuration CASCADE;
 DROP TABLE IF EXISTS public.type_double_damage_to CASCADE;
 DROP TABLE IF EXISTS public.type_half_damage_to CASCADE;
 DROP TABLE IF EXISTS public.type_no_damage_to CASCADE;
@@ -15,6 +16,15 @@ DROP TABLE IF EXISTS public.user_role CASCADE;
 DROP TABLE IF EXISTS public.pokemon CASCADE;
 
 --TODO tabella per associare ad ogni pokemon scelto dall'utente fino a 4 mosse
+
+CREATE TABLE public.global_configuration
+(
+    pk_global_configuration SMALLINT     NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "key"                   VARCHAR(25)  NOT NULL,
+    value                   VARCHAR(255) NOT NULL,
+    description             VARCHAR(255),
+    CONSTRAINT unique_config_key UNIQUE ("key")
+);
 
 CREATE TABLE public.user_role
 (
@@ -34,10 +44,13 @@ CREATE TABLE public.user_team
     pk_user_team INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name         VARCHAR(50) NOT NULL,
     fk_user_uid  VARCHAR(28) NOT NULL,
-    team_number  INTEGER     NOT NULL,
+    created_at   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_user FOREIGN KEY (fk_user_uid) REFERENCES public.user (firebase_uid) ON DELETE CASCADE,
-    CONSTRAINT unique_user_team UNIQUE (fk_user_uid, team_number)
+    CONSTRAINT unique_user_team_name UNIQUE (fk_user_uid, name)
 );
+CREATE INDEX idx_user_team_created_at ON public.user_team (created_at);
+CREATE INDEX idx_user_team_user_created_at ON public.user_team (fk_user_uid, created_at);
+
 
 CREATE TABLE public.pokemon
 (

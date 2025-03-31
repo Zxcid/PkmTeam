@@ -1,3 +1,6 @@
+INSERT INTO public.global_configuration ("key", value, description)
+VALUES ('basicUserMaxTeams', '3', 'The max number of teams a basic user can have.');
+
 INSERT INTO public.user_role (name)
 VALUES ('BASIC'), ('PREMIUM');
 

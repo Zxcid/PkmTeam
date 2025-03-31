@@ -5,16 +5,14 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-public class PokemonDto {
-    private Integer pkPokemon;
-    private Integer index;
-    private String name;
-    private Integer height;
-    private Integer weight;
-    private Integer baseExperience;
-    private String spriteRef;
-    private String spriteUrl;
-    private List<String> types;
+public record PokemonDto(
+        Integer pkPokemon,
+        Integer index,
+        String name,
+        Integer height,
+        Integer weight,
+        Integer baseExperience,
+        String spriteRef,
+        String spriteUrl,
+        List<String> types) {
 }

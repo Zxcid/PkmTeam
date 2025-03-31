@@ -5,6 +5,7 @@ import com.pkmteam.backend.db.entity.UserEntity;
 import com.pkmteam.backend.db.repository.UserRepository;
 import com.pkmteam.backend.db.repository.UserRoleRepository;
 import com.pkmteam.backend.dto.UserDto;
+import com.pkmteam.backend.dto.enums.UserRole;
 import com.pkmteam.backend.mapper.UserMapper;
 import com.pkmteam.backend.utils.SecurityUtils;
 import jakarta.transaction.Transactional;
@@ -30,7 +31,7 @@ public class UserService {
         if (user.getFirebaseUid() == null) {
             user.setFirebaseUid(firebaseUid);
             user.setRole(
-                    userRoleRepository.findByName("BASIC")
+                    userRoleRepository.findByName(UserRole.BASIC.toString())
                             .orElseThrow(() -> new IllegalArgumentException("Cannot find user role: BASIC"))
             );
         }
