@@ -8,11 +8,11 @@ import com.pkmteam.backend.dto.TeamRequestDto;
 import com.pkmteam.backend.dto.UserTeamDto;
 import com.pkmteam.backend.dto.enums.GlobalConfigKeys;
 import com.pkmteam.backend.mapper.UserTeamMapper;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -31,8 +31,16 @@ public class TeamService {
     private final UserTeamMapper userTeamMapper;
     private final GlobalConfigurationService globalConfigurationService;
 
+    @Transactional(readOnly = true)
+    public List<UserTeamDto> getByUser(String firebaseUid) {
+        return this.userTeamRepository.findAllByUser_FirebaseUid(firebaseUid)
+                .stream()
+                .map(userTeamMapper::userTeamEntityToTeamDto)
+                .toList();
+    }
+
     @Transactional
-    public UserTeamDto createTeam(String firebaseUid, TeamRequestDto request) {
+    public UserTeamDto save(String firebaseUid, TeamRequestDto request) {
 
         UserEntity user = userRepository.findById(firebaseUid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
@@ -62,7 +70,18 @@ public class TeamService {
         );
     }
 
-    public boolean checkTeamNameAvailability(String firebaseUid, String teamName) {
+    @Transactional
+    public void delete(Integer pkUserTeam, String firebaseUid) {
+        UserTeamEntity team = userTeamRepository.findById(pkUserTeam)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found."));
+
+        if (!team.getUser().getFirebaseUid().equals(firebaseUid))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own teams.");
+
+        userTeamRepository.delete(team);
+    }
+
+    public boolean checkNameAvailability(String firebaseUid, String teamName) {
         return !userTeamRepository.existsByUser_FirebaseUidAndNameIgnoreCase(firebaseUid, teamName);
     }
 
