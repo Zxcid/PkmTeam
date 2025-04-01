@@ -1,15 +1,18 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize, Observable, Subject, switchMap } from "rxjs";
 import { ESpinnerType } from 'src/app/shared/constants/app.constants';
-import { ICreateTeamRequest } from 'src/app/shared/constants/team.model';
+import { ESections } from 'src/app/shared/constants/routing.constants';
+import { ICreateTeamRequest, ITeamDto } from 'src/app/shared/constants/team.model';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { TeamsService } from 'src/app/shared/services/teams.service';
+import { teamNameValidator } from 'src/app/shared/validators/team-name.validator';
 import { IPokemon } from "../../shared/constants/pokemon.model";
 import { PokemonService } from "../../shared/services/pokemon.service";
 import { TeamPokemonForm } from '../constants/form.constants';
-import { teamNameValidator } from 'src/app/shared/validators/team-name.validator';
 
 @Component({
   selector: 'app-new-team',
@@ -32,7 +35,8 @@ export class NewTeamComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private pkmService: PokemonService,
     private teamService: TeamsService,
-    private spinner: SpinnerService
+    private spinner: SpinnerService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -91,7 +95,10 @@ export class NewTeamComponent implements OnInit, OnDestroy {
     this.spinner.show(ESpinnerType.PIKA);
     this.teamService.saveTeam(request)
       .pipe(finalize(() => this.spinner.hide()))
-      .subscribe();
+      .subscribe({
+        next: (response: ITeamDto) => this.router.navigate([ESections.teams, response.pkUserTeam]),
+        error: (error: HttpErrorResponse) => new Error(error.message)
+      });
   }
 
   deleteTeam(): void {

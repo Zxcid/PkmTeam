@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable, tap } from "rxjs";
 import { AbstractAuthenticatedHttpService } from '../auth/abstract-authenticated-http.service';
 import { ICreateTeamRequest, ITeamDto } from '../constants/team.model';
 import { ApiService } from './api.service';
@@ -11,13 +11,16 @@ import { SnackbarService } from './snackbar.service';
   providedIn: 'root'
 })
 export class TeamsService extends AbstractAuthenticatedHttpService {
-  
+
+  private teamsSubject: BehaviorSubject<ITeamDto[]> = new BehaviorSubject<ITeamDto[]>([]);
+  teams$: Observable<ITeamDto[]> = this.teamsSubject.asObservable();
+
   constructor(
-    http: HttpClient, 
-    auth: Auth, 
+    http: HttpClient,
+    auth: Auth,
     snackbar: SnackbarService,
     private api: ApiService
-  ) { 
+  ) {
     super(http, auth, snackbar);
   }
 
@@ -31,11 +34,36 @@ export class TeamsService extends AbstractAuthenticatedHttpService {
 
   saveTeam(team: ICreateTeamRequest): Observable<ITeamDto> {
     const url: string = this.api.teams.save();
-    return this.post$(url, team);
+    return this.post$<ITeamDto>(url, team)
+      .pipe(
+        tap((createdTeam: ITeamDto) => {
+          const current = this.teamsSubject.value;
+          this.teamsSubject.next([...current, createdTeam]);
+        })
+      )
   }
 
   deleteTeam(id: number): Observable<unknown> {
     const url: string = this.api.teams.delete(id);
-    return this.delete$(url);
+    return this.delete$(url)
+      .pipe(
+        tap(() => {
+          const updatedTeams = this.teamsSubject.value.filter(team => team.pkUserTeam !== id);
+          this.teamsSubject.next(updatedTeams);
+        })
+      );
+  }
+
+  getUserTeams(): Observable<ITeamDto[]> {
+    const url: string = this.api.teams.getAll();
+    return this.get$<ITeamDto[]>(url)
+      .pipe(
+        tap((resp: ITeamDto[]) => this.teamsSubject.next(resp))
+      );
+  }
+
+  getUserTeamById(id: number): Observable<ITeamDto> {
+    const url: string = '';
+    return this.get$(url);
   }
 }

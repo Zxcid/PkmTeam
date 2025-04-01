@@ -5,13 +5,15 @@ import { NewTeamComponent } from './new-team/new-team.component';
 import { TeamMemberCardComponent } from './new-team/team-member-card/team-member-card.component';
 import { TeamsRoutingModule } from "./teams-routing.module";
 import { TeamsComponent } from './teams.component';
+import { TeamDetailComponent } from './team-detail/team-detail.component';
 
 
 @NgModule({
   declarations: [
     TeamsComponent,
     NewTeamComponent,
-    TeamMemberCardComponent
+    TeamMemberCardComponent,
+    TeamDetailComponent
   ],
   imports: [
     SharedModule, 

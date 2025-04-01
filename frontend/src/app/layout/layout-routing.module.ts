@@ -1,11 +1,11 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
-import {LayoutComponent} from "./layout.component";
-import {ESections} from "../shared/constants/routing.constants";
-import {LoginComponent} from "./login/login.component";
-import {HomeComponent} from "./home/home.component";
-import {redirectUnauthorizedTo, AuthGuard} from "@angular/fire/auth-guard";
-import {redirectUnauthorizedToLogin} from "../shared/guards/redirect-to-login";
+import { NgModule } from '@angular/core';
+import { AuthGuard } from "@angular/fire/auth-guard";
+import { RouterModule, Routes } from '@angular/router';
+import { ESections } from "../shared/constants/routing.constants";
+import { redirectUnauthorizedToLogin } from "../shared/guards/redirect-to-login";
+import { HomeComponent } from "./home/home.component";
+import { LayoutComponent } from "./layout.component";
+import { LoginComponent } from "./login/login.component";
 
 const routes: Routes = [
   {
@@ -25,13 +25,13 @@ const routes: Routes = [
         path: ESections.home,
         component: HomeComponent,
         canActivate: [AuthGuard],
-        data: {authGuardPipe: redirectUnauthorizedToLogin}
+        data: { authGuardPipe: redirectUnauthorizedToLogin }
       },
       {
         path: ESections.teams,
         loadChildren: () => import('../teams/teams.module').then(m => m.TeamsModule),
         canActivate: [AuthGuard],
-        data: {authGuardPipe: redirectUnauthorizedToLogin}
+        data: { authGuardPipe: redirectUnauthorizedToLogin }
       }
     ]
   }
