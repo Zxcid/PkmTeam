@@ -12,12 +12,12 @@ export const environment = {
   },
   api: {
     user: {
-      login: 'http://localhost:8080/user/login'
+      login: `${env['BACKEND_URL']}/user/login`
     },
     team: {
-      save: 'http://localhost:8080/team/save',
-      check_name: 'http://localhost:8080/team/check-name'
+      save: `${env['BACKEND_URL']}/team/save`,
+      check_name: `${env['BACKEND_URL']}/team/check-name`
     },
-    pokemon: 'http://localhost:8080/pokemon'
+    pokemon: `${env['BACKEND_URL']}/pokemon`
   }
 }

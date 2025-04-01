@@ -1,6 +1,43 @@
 #team-member-card-wrapper {
-    .chip {
-        background-color: transparent;
-        border-style: solid;
+    width: 100%;
+
+    .team-memeber-card {
+        width: 98%;
+        padding-right: 15px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        .mat-mdc-card-header, 
+        .mat-mdc-card-title-group {
+            align-items: center;
+            padding: 0;
+            width: auto;
+            justify-content: unset;
+
+            img {
+                order: -1;
+            }
+        }
+
+        .mat-mdc-card-header {
+            width: 60%;
+        }
+
+        .mat-mdc-card-title-group {
+            width: 40%;
+        }
+
+        .mdc-card__actions {
+            padding: 0;
+        }
+
+        .chip {
+            background-color: transparent;
+            border-style: solid;
+        }
     }
+    
 }

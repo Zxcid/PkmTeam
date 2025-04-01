@@ -10,8 +10,8 @@
       <mat-form-field *ngIf="isTitleEditable" class="w-100">
         <mat-label>Team name</mat-label>
         <input matInput formControlName="teamName">
-        <button *ngIf="teamForm.get('teamName')?.value" matSuffix mat-icon-button
-          [disabled]="teamForm.get('teamName')?.invalid" (click)="toggleIsTitleEditable()">
+        <button *ngIf="teamForm.get('teamName')?.value && teamForm.get('teamName')?.valid" matSuffix mat-icon-button
+          (click)="toggleIsTitleEditable()">
           <mat-icon class="color-green-2">check</mat-icon>
         </button>
         <mat-error *ngIf="teamForm.get('teamName')?.hasError('teamNameTaken')">
@@ -35,7 +35,7 @@
       </mat-form-field>
 
       <div *ngIf="teamMembers.length > 0">
-        <div class="d-flex flex-wrap justify-content-evenly gap-row-20">
+        <div class="w-100">
           <ng-container *ngFor="let control of teamMembers.controls; let i = index">
             <app-team-member-card [form]="control" (removed)="onPokemonRemoved(i)"></app-team-member-card>
           </ng-container>

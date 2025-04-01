@@ -20,14 +20,13 @@ export class NewTeamComponent implements OnInit, OnDestroy {
   isTitleEditable = false;
   teamCount = 0;
   teamForm!: FormGroup;
+  pokemonList!: Observable<IPokemon[]>;
+  pkmSearch$ = new Subject<string>();
+  destroy$ = new Subject<boolean>();
 
   get teamMembers(): FormArray {
     return this.teamForm.get('teamMembers') as FormArray;
   }
-
-  pokemonList!: Observable<IPokemon[]>;
-  pkmSearch$ = new Subject<string>();
-  destroy$ = new Subject<boolean>();
 
   constructor(
     private fb: FormBuilder,

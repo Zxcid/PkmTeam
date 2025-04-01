@@ -1,11 +1,11 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
-import { Observable, of } from "rxjs";
+import { Observable } from "rxjs";
+import { environment } from 'src/environments/environment';
 import { AbstractAuthenticatedHttpService } from '../auth/abstract-authenticated-http.service';
 import { ICreateTeamRequest, ITeamDto } from '../constants/team.model';
 import { SnackbarService } from './snackbar.service';
-import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
