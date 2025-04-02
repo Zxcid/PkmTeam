@@ -87,6 +87,10 @@ export class NewTeamComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     const { teamName, teamMembers } = this.teamForm.getRawValue();
+
+    if (!teamName || teamName === 'New Team')
+      throw new Error('Please, insert a valid name for the team');
+
     const request: ICreateTeamRequest = {
       teamName: teamName,
       pkPokemons: teamMembers.map((pkm: TeamPokemonForm) => pkm.pkPokemon)
@@ -99,10 +103,6 @@ export class NewTeamComponent implements OnInit, OnDestroy {
         next: (response: ITeamDto) => this.router.navigate([ESections.teams, response.pkUserTeam]),
         error: (error: HttpErrorResponse) => new Error(error.message)
       });
-  }
-
-  deleteTeam(): void {
-    // TODO
   }
 
   private createForm(): void {

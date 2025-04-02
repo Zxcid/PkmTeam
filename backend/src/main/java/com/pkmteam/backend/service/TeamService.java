@@ -39,6 +39,14 @@ public class TeamService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public UserTeamDto getByUserAndId(Integer pkUserTeam, String firebaseUid) {
+        UserTeamEntity team = userTeamRepository.findByPkUserTeamAndUser_FirebaseUid(pkUserTeam, firebaseUid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found."));
+
+        return userTeamMapper.userTeamEntityToTeamDto(team);
+    }
+
     @Transactional
     public UserTeamDto save(String firebaseUid, TeamRequestDto request) {
 

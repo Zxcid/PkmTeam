@@ -15,6 +15,7 @@ export class ApiService {
   private readonly teamsBaseUrl: string = `${this.baseUrl}/teams`;
   readonly teams = {
     getAll: () => `${this.teamsBaseUrl}`,
+    getById: (id: number) => `${this.teamsBaseUrl}/${id}`,
     save: () => `${this.teamsBaseUrl}`,
     delete: (id: number) => `${this.teamsBaseUrl}/${id}`,
     checkName: () => `${this.teamsBaseUrl}/check`

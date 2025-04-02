@@ -19,16 +19,21 @@ public class TeamController {
 
     private final TeamService teamService;
 
-    @GetMapping
-    public ResponseEntity<List<UserTeamDto>> getByUser(@AuthenticationPrincipal UserPrincipal user) {
-        return ResponseEntity.ok(teamService.getByUser(user.firebaseUid()));
-    }
-
     @PostMapping
     public ResponseEntity<UserTeamDto> save(@RequestBody TeamRequestDto request, @AuthenticationPrincipal UserPrincipal user) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(teamService.save(user.firebaseUid(), request));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserTeamDto>> getByUser(@AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.ok(teamService.getByUser(user.firebaseUid()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserTeamDto> getById(@PathVariable Integer id, @AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.ok(teamService.getByUserAndId(id, user.firebaseUid()));
     }
 
     @DeleteMapping("/{id}")

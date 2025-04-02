@@ -63,7 +63,7 @@ export class TeamsService extends AbstractAuthenticatedHttpService {
   }
 
   getUserTeamById(id: number): Observable<ITeamDto> {
-    const url: string = '';
+    const url: string = this.api.teams.getById(id);
     return this.get$(url);
   }
 }
