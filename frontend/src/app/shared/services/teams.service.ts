@@ -43,6 +43,11 @@ export class TeamsService extends AbstractAuthenticatedHttpService {
       )
   }
 
+  updateTeam(request: ICreateTeamRequest, id: number): Observable<ITeamDto> {
+    const url: string = this.api.teams.update(id);
+    return this.put$<ITeamDto>(url, request);
+  }
+
   deleteTeam(id: number): Observable<unknown> {
     const url: string = this.api.teams.delete(id);
     return this.delete$(url)

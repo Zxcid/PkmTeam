@@ -2,6 +2,7 @@ package com.pkmteam.backend.service;
 
 import com.pkmteam.backend.db.entity.*;
 import com.pkmteam.backend.db.repository.PokemonRepository;
+import com.pkmteam.backend.db.repository.TeamPokemonRepository;
 import com.pkmteam.backend.db.repository.UserRepository;
 import com.pkmteam.backend.db.repository.UserTeamRepository;
 import com.pkmteam.backend.dto.TeamRequestDto;
@@ -79,6 +80,35 @@ public class TeamService {
     }
 
     @Transactional
+    public UserTeamDto update(String firebaseUid, TeamRequestDto request, Integer pkUserTeam) {
+        UserTeamEntity team = userTeamRepository.findById(pkUserTeam)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team to update not found."));
+
+        if (!team.getUser().getFirebaseUid().equals(firebaseUid))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This team does not belong to you.");
+
+        List<Integer> pkPokemons = request.pkPokemons();
+        if (pkPokemons.size() > 6)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A team can have no more than 6 Pokémon!");
+
+        List<PokemonEntity> pokemons = pokemonRepository.findAllById(pkPokemons);
+        if (pokemons.size() != pkPokemons.size())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "One or more Pokémon not found.");
+
+        team.getTeamMembers().removeAll(
+                team.getTeamMembers()
+        );
+
+        List<TeamPokemonEntity> newMembers = createTeamMembers(team, pokemons);
+        team.getTeamMembers().addAll(newMembers);
+        team.setName(request.teamName());
+
+        return userTeamMapper.userTeamEntityToTeamDto(
+                userTeamRepository.save(team)
+        );
+    }
+
+    @Transactional
     public void delete(Integer pkUserTeam, String firebaseUid) {
         UserTeamEntity team = userTeamRepository.findById(pkUserTeam)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found."));
@@ -96,7 +126,7 @@ public class TeamService {
     private List<TeamPokemonEntity> createTeamMembers(UserTeamEntity team, List<PokemonEntity> pokemons) {
         return IntStream.range(0, pokemons.size())
                 .mapToObj(i -> {
-                    var memberId = new TeamPokemonEntityPK(0, (short) (i + 1));
+                    var memberId = new TeamPokemonEntityPK(team.getPkUserTeam(), (short) (i + 1));
                     var member = new TeamPokemonEntity();
                     member.setId(memberId);
                     member.setTeam(team);

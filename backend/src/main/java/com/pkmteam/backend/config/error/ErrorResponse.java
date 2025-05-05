@@ -1,4 +1,4 @@
-package com.pkmteam.backend.config;
+package com.pkmteam.backend.config.error;
 
 import lombok.Builder;
 import lombok.Data;

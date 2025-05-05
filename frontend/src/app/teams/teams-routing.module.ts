@@ -4,7 +4,6 @@ import { RouterModule, Routes } from "@angular/router";
 import { ESections } from "../shared/constants/routing.constants";
 import { redirectUnauthorizedToLogin } from "../shared/guards/redirect-to-login";
 import { NewTeamComponent } from "./new-team/new-team.component";
-import { TeamDetailComponent } from "./team-detail/team-detail.component";
 import { TeamsComponent } from "./teams.component";
 
 const routes: Routes = [
@@ -25,7 +24,7 @@ const routes: Routes = [
       },
       {
         path: ':id',
-        component: TeamDetailComponent,
+        component: NewTeamComponent,
         canActivate: [AuthGuard],
         data: { authGuadPipe: redirectUnauthorizedToLogin }
       }

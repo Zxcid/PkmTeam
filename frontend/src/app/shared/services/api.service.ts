@@ -17,6 +17,7 @@ export class ApiService {
     getAll: () => `${this.teamsBaseUrl}`,
     getById: (id: number) => `${this.teamsBaseUrl}/${id}`,
     save: () => `${this.teamsBaseUrl}`,
+    update: (id: number) => `${this.teamsBaseUrl}/${id}`,
     delete: (id: number) => `${this.teamsBaseUrl}/${id}`,
     checkName: () => `${this.teamsBaseUrl}/check`
   };

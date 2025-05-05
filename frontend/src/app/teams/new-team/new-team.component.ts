@@ -2,8 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged, finalize, Observable, Subject, switchMap } from "rxjs";
+import { ActivatedRoute, Router } from '@angular/router';
+import { debounceTime, distinctUntilChanged, finalize, Observable, Subject, switchMap, tap } from "rxjs";
 import { ESpinnerType } from 'src/app/shared/constants/app.constants';
 import { ESections } from 'src/app/shared/constants/routing.constants';
 import { ICreateTeamRequest, ITeamDto } from 'src/app/shared/constants/team.model';
@@ -13,6 +13,7 @@ import { teamNameValidator } from 'src/app/shared/validators/team-name.validator
 import { IPokemon } from "../../shared/constants/pokemon.model";
 import { PokemonService } from "../../shared/services/pokemon.service";
 import { TeamPokemonForm } from '../constants/form.constants';
+import { SnackbarService } from 'src/app/shared/services/snackbar.service';
 
 @Component({
   selector: 'app-new-team',
@@ -20,6 +21,8 @@ import { TeamPokemonForm } from '../constants/form.constants';
   styleUrls: ['./new-team.component.scss']
 })
 export class NewTeamComponent implements OnInit, OnDestroy {
+  editMode: boolean = false;
+  pkUserTeam!: number;
   isTitleEditable = false;
   teamCount = 0;
   teamForm!: FormGroup;
@@ -36,10 +39,20 @@ export class NewTeamComponent implements OnInit, OnDestroy {
     private pkmService: PokemonService,
     private teamService: TeamsService,
     private spinner: SpinnerService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    private snackbar: SnackbarService
   ) { }
 
   ngOnInit(): void {
+    const id: string | null = this.route.snapshot.paramMap.get('id');
+
+    if (id) {
+      this.editMode = true;
+      this.pkUserTeam = +id;
+      this.getTeamDetails(+id);
+    }
+
     this.createForm();
 
     this.pokemonList = this.pkmSearch$.pipe(
@@ -79,6 +92,7 @@ export class NewTeamComponent implements OnInit, OnDestroy {
 
     this.teamMembers.push(pkmForm);
     this.teamForm.get('pokemonSearch')?.reset();
+    this.teamForm.markAsDirty();
   }
 
   onPokemonRemoved(index: number): void {
@@ -91,17 +105,51 @@ export class NewTeamComponent implements OnInit, OnDestroy {
     if (!teamName || teamName === 'New Team')
       throw new Error('Please, insert a valid name for the team');
 
+    if (!this.editMode && this.teamForm.get('teamName')?.hasError('teamNameTaken'))
+      throw new Error('The team name is already in use.');
+
+    if (this.teamForm.pristine) {
+      this.snackbar.warning('There are no changes in the team.');
+      return;
+    }
+
     const request: ICreateTeamRequest = {
       teamName: teamName,
       pkPokemons: teamMembers.map((pkm: TeamPokemonForm) => pkm.pkPokemon)
     };
 
+    if (this.pkUserTeam) 
+      this.updateTeam(request)
+    else 
+      this.saveTeam(request);
+  }
+
+  private saveTeam(request: ICreateTeamRequest): void {
     this.spinner.show(ESpinnerType.PIKA);
     this.teamService.saveTeam(request)
       .pipe(finalize(() => this.spinner.hide()))
       .subscribe({
-        next: (response: ITeamDto) => this.router.navigate([ESections.teams, response.pkUserTeam]),
+        next: (response: ITeamDto) => !this.editMode ? this.router.navigate([ESections.teams, response.pkUserTeam]) : null,
         error: (error: HttpErrorResponse) => new Error(error.message)
+      });
+  }
+
+  private updateTeam(request: ICreateTeamRequest): void {
+    this.spinner.show(ESpinnerType.PIKA);
+    this.teamService.updateTeam(request, this.pkUserTeam)
+      .pipe(
+        finalize(() => this.spinner.hide())
+      )
+      .subscribe();
+  }
+
+  onDeleteTeam() {
+    this.spinner.show(ESpinnerType.PIKA);
+    this.teamService.deleteTeam(this.pkUserTeam)
+      .subscribe({
+        next: () => this.router.navigate([ESections.teams, ESections.new_team]),
+        error: (error: HttpErrorResponse) => new Error(error.message),
+        complete: () => this.spinner.hide()
       });
   }
 
@@ -114,6 +162,33 @@ export class NewTeamComponent implements OnInit, OnDestroy {
       }],
       pokemonSearch: [''],
       teamMembers: this.fb.array([])
+    });
+  }
+
+  private getTeamDetails(id: number): void {
+    this.spinner.show(ESpinnerType.PIKA);
+    this.teamService.getUserTeamById(+id!)
+      .pipe(
+        tap((team) => console.log('team: ', team)),
+        finalize(() => this.spinner.hide())
+      )
+      .subscribe((team: ITeamDto) => this.patchValueToForm(team));
+  }
+
+  private patchValueToForm(team: ITeamDto): void {
+    const { name, teamMembers } = team;
+
+    this.teamForm.patchValue({ teamName: name });
+
+    teamMembers.forEach(pkm => {
+      const pkmForm = this.fb.group({
+        pkPokemon: [pkm.pkPokemon],
+        name: [pkm.name],
+        spriteUrl: [pkm.spriteUrl],
+        types: [pkm.types]
+      });
+
+      this.teamMembers.push(pkmForm);
     });
   }
 

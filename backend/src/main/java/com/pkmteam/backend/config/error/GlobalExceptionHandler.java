@@ -1,4 +1,4 @@
-package com.pkmteam.backend.config;
+package com.pkmteam.backend.config.error;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;

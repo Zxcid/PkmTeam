@@ -1,8 +1,5 @@
 package com.pkmteam.backend.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.List;
 
 public record PokemonDto(

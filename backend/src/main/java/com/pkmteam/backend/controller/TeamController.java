@@ -26,6 +26,11 @@ public class TeamController {
                 .body(teamService.save(user.firebaseUid(), request));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<UserTeamDto> update(@PathVariable Integer id, @RequestBody TeamRequestDto request, @AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.ok(teamService.update(user.firebaseUid(), request, id));
+    }
+
     @GetMapping
     public ResponseEntity<List<UserTeamDto>> getByUser(@AuthenticationPrincipal UserPrincipal user) {
         return ResponseEntity.ok(teamService.getByUser(user.firebaseUid()));
