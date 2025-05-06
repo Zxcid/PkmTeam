@@ -7,55 +7,96 @@ export class UtilsService {
 
   constructor() { }
 
-  /**
-   * Method that returns if the input value is empty
-   *
-   * @param input
-   */
-  static isVoid(input: any) {
-    return input === 'undefined' || input === undefined || input === null || input === 'null' || input === '' || (input instanceof Array && input.length === 0);
-  }
+/**
+ * Checks whether the given input is considered "void" or "empty".
+ *
+ * A value is considered void if it is:
+ * - `null` or `undefined`
+ * - a string that is empty, `'null'`, or `'undefined'`
+ * - an empty array (`[]`)
+ * - an empty object (`{}`)
+ * - an empty `Map` or `Set`
+ * - an empty `FileList` (converted via Array.from)
+ * - an empty `Blob` (zero size)
+ *
+ * @param input - The value to check.
+ * @returns `true` if the input is considered void; otherwise, `false`.
+ *
+ * @example
+ * isVoid(null);              // true
+ * isVoid('');                // true
+ * isVoid('null');            // true
+ * isVoid([]);                // true
+ * isVoid({});                // true
+ * isVoid(new Map());         // true
+ * isVoid('hello');           // false
+ * isVoid([1, 2, 3]);         // false
+ * isVoid({ a: 1 });          // false
+ * isVoid(new Blob(['data']));// false
+ */
+  static isVoid(input: unknown): boolean {
+    if (input === null || input === undefined) return true;
 
-  /**
-   * Function that returns if the input object has void properties
-   *
-   * @param obj
-   */
-  static isVoidObj(obj: any): boolean {
-    let control = true;
-    if (!UtilsService.isVoid(obj)) {
-      // @ts-ignore
-      control = Object.keys(obj).reduce((res, k) => res && !(!!obj[k] || obj[k] === false || !isNaN(parseInt(obj[k]))) || obj[k] == {}, true);
+    if (typeof input === 'string') {
+      const trimmed = input.trim();
+      return trimmed === '' || trimmed === 'null' || trimmed === 'undefined';
     }
-    return control;
+
+    if (Array.isArray(input)) {
+      return input.length === 0;
+    }
+
+    if (typeof input === 'object') {
+      if (input instanceof Map || input instanceof Set) {
+        return input.size === 0;
+      }
+
+      if (input instanceof FileList) {
+        return Array.from(input).length === 0;
+      }
+
+      if (input instanceof Blob) {
+        return input.size === 0;
+      }
+
+      // Generic Object
+      return Object.keys(input).length === 0;
+    }
+
+    return false;
   }
 
   /**
-   * Function that replace in a given string all the placeholder with the input value
+   * Replaces all occurrences of a placeholder in a string with a given value.
    *
-   * @param msg message with placeholder
-   * @param placeholder placeholder to replace (usually _{placeholder}_)
-   * @param value value to replace the placeholder with
-   * @return msg message replaced
+   * @param msg - The original message containing the placeholder(s).
+   * @param placeholder - The placeholder to replace. Can be a string or a RegExp.
+   * @param value - The value to insert in place of the placeholder.
+   * @returns The message with all placeholders replaced.
    */
   static replacePlaceholder(msg: string, placeholder: string | RegExp, value: string): string {
-    return msg.replaceAll(placeholder, value);
+    if (typeof placeholder === 'string') {
+      // Escape special characters to use safely in RegExp
+      const escaped = placeholder.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      return msg.replace(new RegExp(escaped, 'g'), value);
+    }
+    return msg.replace(placeholder, value);
   }
 
+
   /**
-   * Function that replace in a given string all the placeholders with their values.
+   * Replaces all placeholders in a message with their corresponding values.
    *
-   * @param msg message with placeholders
-   * @param params2Replace map of the placeholders, where the key is the placeholder and the value the replacement
-   * @return msg message after replace
+   * @param msg - The original message.
+   * @param replacements - A map or object where keys are placeholders and values are replacements.
+   * @returns The updated message with all replacements applied.
    */
-  static replaceAllPlaceholder(msg: string, params2Replace: Map<string, string>): string {
-    if (msg && params2Replace) {
-      params2Replace.forEach((value: string, key: string) => {
-        msg = this.replacePlaceholder(msg, key, value);
-      })
+  static replaceAllPlaceholders(msg: string, replacements: Record<string, string>): string {
+    for (const [placeholder, value] of Object.entries(replacements)) {
+      msg = this.replacePlaceholder(msg, placeholder, value);
     }
     return msg;
   }
+
 
 }

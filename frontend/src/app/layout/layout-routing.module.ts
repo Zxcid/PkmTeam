@@ -3,6 +3,7 @@ import { AuthGuard } from "@angular/fire/auth-guard";
 import { RouterModule, Routes } from '@angular/router';
 import { ESections } from "../shared/constants/routing.constants";
 import { redirectUnauthorizedToLogin } from "../shared/guards/redirect-to-login";
+import { ThankYouComponent } from './thank-you/thank-you.component';
 import { HomeComponent } from "./home/home.component";
 import { LayoutComponent } from "./layout.component";
 import { LoginComponent } from "./login/login.component";
@@ -24,6 +25,12 @@ const routes: Routes = [
       {
         path: ESections.home,
         component: HomeComponent,
+        canActivate: [AuthGuard],
+        data: { authGuardPipe: redirectUnauthorizedToLogin }
+      },
+      {
+        path: ESections.thank_you,
+        component: ThankYouComponent,
         canActivate: [AuthGuard],
         data: { authGuardPipe: redirectUnauthorizedToLogin }
       },

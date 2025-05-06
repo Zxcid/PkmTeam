@@ -1,6 +1,6 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
-import {ESections} from "./shared/constants/routing.constants";
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { ESections } from "./shared/constants/routing.constants";
 
 const routes: Routes = [
   {

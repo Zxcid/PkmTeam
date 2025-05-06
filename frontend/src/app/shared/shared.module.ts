@@ -6,6 +6,7 @@ import { PokeSpinnerComponent } from './components/poke-spinner/poke-spinner.com
 import { MaterialModule } from "./modules/material.module";
 import { TranslocoRootModule } from './modules/transloco-root.module';
 import { GlobalErrorHandlerService } from './services/global-error-handler.service';
+import { PaypalButtonComponent } from './components/paypal-button/paypal-button.component';
 
 export const SHARED_MODULES = [
   CommonModule,
@@ -15,7 +16,8 @@ export const SHARED_MODULES = [
 
 export const SHARED_COMPONENTS = [
   PikaSpinnerComponent,
-  PokeSpinnerComponent
+  PokeSpinnerComponent,
+  PaypalButtonComponent
 ];
 
 @NgModule({
@@ -31,7 +33,7 @@ export const SHARED_COMPONENTS = [
   ],
   providers: [
     { provide: ErrorHandler, useClass: GlobalErrorHandlerService }
-    
+
     // Note: AuthInterceptor has been deprecated in favor of centralized HTTP handling
     // via AbstractAuthenticatedHttpService. It is no longer registered here intentionally.
     // To re-enable it, re-add the following provider:

@@ -1,12 +1,13 @@
-import {NgModule} from '@angular/core';
-import {CommonModule, NgOptimizedImage} from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
+import { NgModule } from '@angular/core';
 
-import {LayoutRoutingModule} from './layout-routing.module';
-import {LayoutComponent} from './layout.component';
-import {LoginComponent} from './login/login.component';
-import {SharedModule} from "../shared/shared.module";
-import { GoogleButtonComponent } from './login/google-button/google-button.component';
+import { SharedModule } from "../shared/shared.module";
+import { ThankYouComponent } from './thank-you/thank-you.component';
 import { HomeComponent } from './home/home.component';
+import { LayoutRoutingModule } from './layout-routing.module';
+import { LayoutComponent } from './layout.component';
+import { GoogleButtonComponent } from './login/google-button/google-button.component';
+import { LoginComponent } from './login/login.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
 
@@ -16,7 +17,8 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
     LoginComponent,
     GoogleButtonComponent,
     HomeComponent,
-    ToolbarComponent
+    ToolbarComponent,
+    ThankYouComponent
   ],
     imports: [
         LayoutRoutingModule,

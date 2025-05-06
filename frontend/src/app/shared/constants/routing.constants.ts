@@ -6,7 +6,8 @@ export enum ESections {
   home = 'home',
   login = 'login',
   teams = 'teams',
-  new_team = 'new-team'
+  new_team = 'new-team',
+  thank_you = 'thank-you'
 }
 
 export interface IAppSections {
@@ -31,6 +32,11 @@ export const __appSections: IAppSections[] = [
   {
     key: ESections.home,
     route: AppRoutingBuilder.fullPath([ESections.home]),
+    title: 'Home'
+  },
+  {
+    key: ESections.thank_you,
+    route: AppRoutingBuilder.fullPath([ESections.thank_you]),
     title: 'Home'
   }
 ];
