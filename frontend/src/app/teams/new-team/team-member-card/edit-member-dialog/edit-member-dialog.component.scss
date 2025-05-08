@@ -1,0 +1,8 @@
+#edit-member-wrapper {
+    .mdc-dialog__title::before {
+        display: none !important;
+    }
+    .mat-mdc-dialog-actions {
+        justify-content: flex-end !important;
+    }
+}

@@ -28,7 +28,8 @@ export const MATERIAL_MODULES = [
   MatSnackBarModule,
   MatDialogModule,
   MatChipsModule,
-  MatSelectModule
+  MatSelectModule,
+  MatDialogModule
 ];
 
 @NgModule({

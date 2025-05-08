@@ -4,6 +4,7 @@ import com.pkmteam.backend.config.auth.UserPrincipal;
 import com.pkmteam.backend.dto.UserTeamDto;
 import com.pkmteam.backend.dto.TeamRequestDto;
 import com.pkmteam.backend.service.TeamService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class TeamController {
     private final TeamService teamService;
 
     @PostMapping
-    public ResponseEntity<UserTeamDto> save(@RequestBody TeamRequestDto request, @AuthenticationPrincipal UserPrincipal user) {
+    public ResponseEntity<UserTeamDto> save(@Valid @RequestBody TeamRequestDto request, @AuthenticationPrincipal UserPrincipal user) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(teamService.save(user.firebaseUid(), request));

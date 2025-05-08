@@ -1,13 +1,27 @@
-import { IPokemon } from "./pokemon.model"
+import { IAbility, INature, IPokemon } from "./pokemon.model"
 
-export interface ICreateTeamRequest {
+export interface ITeamPokemonRequest {
+  pkPokemon: number,
+  pkAbility: number,
+  pkNature: number
+}
+
+export interface ITeamRequest {
   teamName: string,
-  pkPokemons: number[]
+  teamPokemonRequest: ITeamPokemonRequest[]
+}
+
+export interface ITeamPokemon {
+  userTeamId: number,
+  teamMember: number,
+  pokemon: IPokemon,
+  ability: IAbility,
+  nature: INature
 }
 
 export interface ITeamDto {
   pkUserTeam: number,
   name: string,
   createdAt: string,
-  teamMembers: IPokemon[]
+  teamMembers: ITeamPokemon[]
 }

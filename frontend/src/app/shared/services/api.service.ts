@@ -24,6 +24,8 @@ export class ApiService {
 
   private readonly pokemonBaseUrl: string = `${this.baseUrl}/pokemon`;
   readonly pokemon = {
-    search: () => `${this.pokemonBaseUrl}/search-autocomplete`
+    search: () => `${this.pokemonBaseUrl}/search-autocomplete`,
+    abilities: () => `${this.pokemonBaseUrl}/abilities`,
+    natures: () => `${this.pokemonBaseUrl}/natures`
   };
 }

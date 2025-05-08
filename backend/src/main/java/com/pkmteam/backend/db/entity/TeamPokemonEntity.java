@@ -3,8 +3,6 @@ package com.pkmteam.backend.db.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Objects;
-
 @Data
 @Entity
 @Table(name = "team_pokemon", schema = "public", catalog = "postgres")
@@ -22,4 +20,11 @@ public class TeamPokemonEntity {
     @JoinColumn(name = "fk_pokemon", nullable = false)
     private PokemonEntity pokemon;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "fk_ability")
+    private AbilityEntity ability;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "fk_nature")
+    private NatureEntity nature;
 }

@@ -1,7 +1,11 @@
 package com.pkmteam.backend.mapper;
 
+import com.pkmteam.backend.db.entity.AbilityEntity;
+import com.pkmteam.backend.db.entity.NatureEntity;
 import com.pkmteam.backend.db.entity.PokemonEntity;
 import com.pkmteam.backend.db.entity.PokemonTypeEntity;
+import com.pkmteam.backend.dto.AbilityDto;
+import com.pkmteam.backend.dto.NatureDto;
 import com.pkmteam.backend.dto.PokemonDto;
 import com.pkmteam.backend.service.FirebaseStorageService;
 import org.mapstruct.Mapper;
@@ -16,6 +20,12 @@ public abstract class PokemonMapper {
 
     @Autowired
     protected FirebaseStorageService firebaseStorageService;
+
+    public abstract AbilityDto abilityEntityToDto(AbilityEntity entity);
+    public abstract List<AbilityDto> abilityEntityToDto(List<AbilityEntity> entities);
+
+    public abstract NatureDto natureEntityToDto(NatureEntity entity);
+    public abstract List<NatureDto> natureEntityToDto(List<NatureEntity> entities);
 
     @Mapping(target = "types", expression = "java(mapTypes(pokemonEntity.getPokemonTypes()))")
     @Mapping(target = "spriteUrl", expression = "java(firebaseStorageService.getSignedDownloadUrl(pokemonEntity.getSpriteRef()))")

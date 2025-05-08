@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { BehaviorSubject, Observable, tap } from "rxjs";
 import { AbstractAuthenticatedHttpService } from '../auth/abstract-authenticated-http.service';
-import { ICreateTeamRequest, ITeamDto } from '../constants/team.model';
+import { ITeamRequest, ITeamDto } from '../constants/team.model';
 import { ApiService } from './api.service';
 import { SnackbarService } from './snackbar.service';
 
@@ -32,7 +32,7 @@ export class TeamsService extends AbstractAuthenticatedHttpService {
     return this.get$(url, { params });
   }
 
-  saveTeam(team: ICreateTeamRequest): Observable<ITeamDto> {
+  saveTeam(team: ITeamRequest): Observable<ITeamDto> {
     const url: string = this.api.teams.save();
     return this.post$<ITeamDto>(url, team)
       .pipe(
@@ -43,7 +43,7 @@ export class TeamsService extends AbstractAuthenticatedHttpService {
       )
   }
 
-  updateTeam(request: ICreateTeamRequest, id: number): Observable<ITeamDto> {
+  updateTeam(request: ITeamRequest, id: number): Observable<ITeamDto> {
     const url: string = this.api.teams.update(id);
     return this.put$<ITeamDto>(url, request);
   }

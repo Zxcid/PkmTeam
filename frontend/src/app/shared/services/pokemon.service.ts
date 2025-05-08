@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Auth } from "@angular/fire/auth";
 import { Observable } from "rxjs";
 import { AbstractAuthenticatedHttpService } from '../auth/abstract-authenticated-http.service';
-import { IPokemon } from "../constants/pokemon.model";
+import { IAbility, INature, IPokemon } from "../constants/pokemon.model";
 import { ApiService } from "./api.service";
 import { SnackbarService } from "./snackbar.service";
 
@@ -29,5 +29,14 @@ export class PokemonService extends AbstractAuthenticatedHttpService {
     return this.get$<IPokemon[]>(url, { params });
   }
 
+  getAllAbilities(): Observable<IAbility[]> {
+    const url: string = this.api.pokemon.abilities();
+    return this.get$<IAbility[]>(url);
+  }
+
+  getAllNatures(): Observable<INature[]> {
+    const url: string = this.api.pokemon.natures();
+    return this.get$<INature[]>(url);
+  }
 
 }

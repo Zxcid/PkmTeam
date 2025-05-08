@@ -51,7 +51,6 @@ CREATE TABLE public.user_team
 CREATE INDEX idx_user_team_created_at ON public.user_team (created_at);
 CREATE INDEX idx_user_team_user_created_at ON public.user_team (fk_user_uid, created_at);
 
-
 CREATE TABLE public.pokemon
 (
     pk_pokemon      INTEGER       NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -61,16 +60,6 @@ CREATE TABLE public.pokemon
     weight          INTEGER       NOT NULL,
     base_experience INTEGER       NOT NULL,
     sprite_ref      VARCHAR(1000) NOT NULL
-);
-
-CREATE TABLE public.team_pokemon
-(
-    fk_user_team INTEGER  NOT NULL,
-    fk_pokemon   INTEGER  NOT NULL,
-    team_member  SMALLINT NOT NULL CHECK (team_member BETWEEN 1 AND 6),
-    PRIMARY KEY (fk_user_team, team_member),
-    FOREIGN KEY (fk_user_team) REFERENCES public.user_team (pk_user_team) ON DELETE CASCADE,
-    FOREIGN KEY (fk_pokemon) REFERENCES public.pokemon (pk_pokemon)
 );
 
 CREATE TABLE public.stats
@@ -163,4 +152,18 @@ CREATE TABLE public.type_no_damage_to
     PRIMARY KEY (fk_type, target_type),
     FOREIGN KEY (fk_type) REFERENCES public.type (pk_type) ON DELETE CASCADE,
     FOREIGN KEY (target_type) REFERENCES public.type (pk_type) ON DELETE CASCADE
+);
+
+CREATE TABLE public.team_pokemon
+(
+    fk_user_team INTEGER  NOT NULL,
+    fk_pokemon   INTEGER  NOT NULL,
+    fk_nature    INTEGER  NULL,
+    fk_ability   INTEGER  NULL,
+    team_member  SMALLINT NOT NULL CHECK (team_member BETWEEN 1 AND 6),
+    PRIMARY KEY (fk_user_team, team_member),
+    FOREIGN KEY (fk_user_team) REFERENCES public.user_team (pk_user_team) ON DELETE CASCADE,
+    FOREIGN KEY (fk_pokemon) REFERENCES public.pokemon (pk_pokemon),
+    FOREIGN KEY (fk_nature) REFERENCES public.nature (pk_nature),
+    FOREIGN KEY (fk_ability) REFERENCES public.ability (pk_ability)
 );

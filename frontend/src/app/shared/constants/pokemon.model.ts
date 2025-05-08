@@ -9,3 +9,21 @@ export interface IPokemon {
     spriteUrl: string,
     types: string[]
 }
+
+export interface IStat {
+    pkStat: number,
+    name: string
+}
+
+export interface INature {
+    pkNature: number,
+    name: string,
+    malusStat: IStat,
+    bonusStat: IStat
+}
+
+export interface IAbility {
+    pkAbility: number,
+    name: string,
+    description: string
+}

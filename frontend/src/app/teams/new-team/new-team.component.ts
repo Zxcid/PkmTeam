@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize, Observable, Subject, switchMap, tap } from "rxjs";
 import { ESpinnerType } from 'src/app/shared/constants/app.constants';
 import { ESections } from 'src/app/shared/constants/routing.constants';
-import { ICreateTeamRequest, ITeamDto } from 'src/app/shared/constants/team.model';
+import { ITeamRequest, ITeamDto, ITeamPokemon } from 'src/app/shared/constants/team.model';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { TeamsService } from 'src/app/shared/services/teams.service';
 import { teamNameValidator } from 'src/app/shared/validators/team-name.validator';
@@ -87,7 +87,9 @@ export class NewTeamComponent implements OnInit, OnDestroy {
       pkPokemon: [selected.pkPokemon],
       name: [selected.name],
       spriteUrl: [selected.spriteUrl],
-      types: [selected.types]
+      types: [selected.types],
+      ability: [null],
+      nature: [null]
     });
 
     this.teamMembers.push(pkmForm);
@@ -100,7 +102,7 @@ export class NewTeamComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    const { teamName, teamMembers } = this.teamForm.getRawValue();
+    const { teamName, teamMembers } = this.teamForm.value;
 
     if (!teamName || teamName === 'New Team')
       throw new Error('Please, insert a valid name for the team');
@@ -113,18 +115,26 @@ export class NewTeamComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const request: ICreateTeamRequest = {
+    const request: ITeamRequest = {
       teamName: teamName,
-      pkPokemons: teamMembers.map((pkm: TeamPokemonForm) => pkm.pkPokemon)
+      teamPokemonRequest: teamMembers.map((tm: any) => ({
+        pkPokemon: tm.pkPokemon,
+        pkAbility: tm.ability?.pkAbility,
+        pkNature: tm.nature?.pkNature
+      }))
     };
 
-    if (this.pkUserTeam) 
-      this.updateTeam(request)
-    else 
+    if (this.pkUserTeam) {
+      console.log('IF');
+      this.updateTeam(request);
+    }
+    else {
+      console.log('ELSE');
       this.saveTeam(request);
+    }
   }
 
-  private saveTeam(request: ICreateTeamRequest): void {
+  private saveTeam(request: ITeamRequest): void {
     this.spinner.show(ESpinnerType.PIKA);
     this.teamService.saveTeam(request)
       .pipe(finalize(() => this.spinner.hide()))
@@ -134,7 +144,7 @@ export class NewTeamComponent implements OnInit, OnDestroy {
       });
   }
 
-  private updateTeam(request: ICreateTeamRequest): void {
+  private updateTeam(request: ITeamRequest): void {
     this.spinner.show(ESpinnerType.PIKA);
     this.teamService.updateTeam(request, this.pkUserTeam)
       .pipe(
@@ -180,12 +190,14 @@ export class NewTeamComponent implements OnInit, OnDestroy {
 
     this.teamForm.patchValue({ teamName: name });
 
-    teamMembers.forEach(pkm => {
+    teamMembers.forEach(tm => {
       const pkmForm = this.fb.group({
-        pkPokemon: [pkm.pkPokemon],
-        name: [pkm.name],
-        spriteUrl: [pkm.spriteUrl],
-        types: [pkm.types]
+        pkPokemon: [tm.pokemon?.pkPokemon],
+        name: [tm.pokemon?.name],
+        spriteUrl: [tm.pokemon?.spriteUrl],
+        types: [tm.pokemon?.types],
+        ability: tm.ability,
+        nature: tm.nature
       });
 
       this.teamMembers.push(pkmForm);

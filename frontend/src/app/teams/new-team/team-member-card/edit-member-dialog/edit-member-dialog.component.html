@@ -1,0 +1,39 @@
+<div id="edit-member-wrapper" class="h-100 p-2 d-flex flex-column">
+    <div mat-dialog-title>
+        <div class="d-flex justify-content-between">
+            <div class="d-flex align-items-center">
+                <img mat-card-sm-image [src]="data.teamPokemon.spriteUrl">
+                <div>{{ (data.teamPokemon.name| transloco) | titlecase }}</div>
+            </div>
+            <mat-icon mat-dialog-close class="c-pointer align-self-center">close</mat-icon>
+        </div>
+    </div>
+
+    <form [formGroup]="pokemonDetailForm" (ngSubmit)="onSubmit()" class="d-flex">
+        <mat-dialog-content class="h-100">
+            <div class="d-flex gap-20">
+                <mat-form-field>
+                    <mat-label>Ability</mat-label>
+                    <mat-select formControlName="ability">
+                        <mat-option *ngFor="let ability of abilityList | async" [value]="ability">
+                            {{(ability.name | transloco) | titlecase}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Nature</mat-label>
+                    <mat-select formControlName="nature">
+                        <mat-option *ngFor="let nature of natureList | async" [value]="nature">
+                            {{(nature.name | transloco) | titlecase}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </mat-dialog-content>
+
+        <mat-dialog-actions>
+            <button mat-stroked-button color="warn">Action_1</button>
+            <button mat-stroked-button color="primary" type="submit">Save</button>
+        </mat-dialog-actions>
+    </form>
+</div>
