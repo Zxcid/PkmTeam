@@ -173,11 +173,11 @@ p {
 /* Display options */
 .d {
   &-flex {
-    display: flex;
+    display: flex !important;
   }
 
   &-block {
-    display: block;
+    display: block !important;
   }
 }
 

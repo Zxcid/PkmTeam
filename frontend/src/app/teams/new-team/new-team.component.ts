@@ -45,6 +45,7 @@ export class NewTeamComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.createForm();
     const id: string | null = this.route.snapshot.paramMap.get('id');
 
     if (id) {
@@ -52,8 +53,6 @@ export class NewTeamComponent implements OnInit, OnDestroy {
       this.pkUserTeam = +id;
       this.getTeamDetails(+id);
     }
-
-    this.createForm();
 
     this.pokemonList = this.pkmSearch$.pipe(
       debounceTime(300),
@@ -125,11 +124,9 @@ export class NewTeamComponent implements OnInit, OnDestroy {
     };
 
     if (this.pkUserTeam) {
-      console.log('IF');
       this.updateTeam(request);
     }
     else {
-      console.log('ELSE');
       this.saveTeam(request);
     }
   }
