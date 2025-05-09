@@ -1,9 +1,10 @@
 package com.pkmteam.backend.service;
 
-import com.google.api.gax.rpc.NotFoundException;
 import com.pkmteam.backend.db.entity.*;
 import com.pkmteam.backend.db.repository.*;
-import com.pkmteam.backend.dto.*;
+import com.pkmteam.backend.dto.TeamPokemonRequestDto;
+import com.pkmteam.backend.dto.TeamRequestDto;
+import com.pkmteam.backend.dto.UserTeamDto;
 import com.pkmteam.backend.dto.enums.GlobalConfigKeys;
 import com.pkmteam.backend.mapper.UserTeamMapper;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import static com.pkmteam.backend.dto.enums.UserRole.PREMIUM;
 @RequiredArgsConstructor
 public class TeamService {
 
+    private final TeamNativeRepository teamNativeRepository;
     private final UserTeamRepository userTeamRepository;
     private final UserRepository userRepository;
     private final PokemonRepository pokemonRepository;
@@ -85,6 +87,28 @@ public class TeamService {
         );
     }
 
+    /**
+     * Updates an existing team by replacing all its current members with the new configuration provided in the request.
+     * <p>
+     * This method performs the update by first executing a native SQL {@code DELETE} to remove all associated
+     * {@code team_pokemon} entries, followed by a sequence of native {@code INSERT} statements to persist the new team members.
+     * It also updates the team name if changed.
+     * </p>
+     * <p>
+     * This approach avoids the known pitfalls of Hibernate's orphan removal and entity state conflicts,
+     * particularly when working with {@code @OneToMany} associations and unique constraints on foreign keys.
+     * </p>
+     * <p>
+     * For more context on the reasoning behind this native implementation, refer to the Javadoc of
+     * {@link com.pkmteam.backend.db.repository.TeamNativeRepository}.
+     * </p>
+     *
+     * @param firebaseUid the ID of the currently authenticated user
+     * @param request      the new team configuration
+     * @param pkUserTeam   the primary key of the team to update
+     * @return the updated team DTO
+     * @throws ResponseStatusException if the team is not found, does not belong to the user, or input is invalid
+     */
     @Transactional
     public UserTeamDto update(String firebaseUid, TeamRequestDto request, Integer pkUserTeam) {
         UserTeamEntity team = userTeamRepository.findById(pkUserTeam)
@@ -95,23 +119,33 @@ public class TeamService {
 
         List<Integer> pkPokemons = request.teamPokemonRequest().stream()
                 .map(TeamPokemonRequestDto::pkPokemon)
-                .toList();        if (pkPokemons.size() > 6)
+                .toList();
+        if (pkPokemons.size() > 6)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A team can have no more than 6 Pokémon!");
 
         List<PokemonEntity> pokemons = pokemonRepository.findAllById(pkPokemons);
         if (pokemons.size() != pkPokemons.size())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "One or more Pokémon not found.");
 
-        team.getTeamMembers().removeAll(
-                team.getTeamMembers()
-        );
+        teamNativeRepository.deleteAllTeamMembers(pkUserTeam);
 
-        List<TeamPokemonEntity> newMembers = createTeamMembers(team, request.teamPokemonRequest());
-        team.getTeamMembers().addAll(newMembers);
-        team.setName(request.teamName());
+        final var members = request.teamPokemonRequest();
+        for (int i = 0; i < members.size(); i++) {
+            var dto = members.get(i);
+            teamNativeRepository.insertTeamMember(
+                    pkUserTeam,
+                    i + 1, // team_member 1..6
+                    dto.pkPokemon(),
+                    dto.pkAbility(),
+                    dto.pkNature()
+            );
+        }
+
+        teamNativeRepository.updateTeamName(pkUserTeam, request.teamName());
 
         return userTeamMapper.userTeamEntityToDto(
-                userTeamRepository.save(team)
+                userTeamRepository.findById(pkUserTeam)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Updated team not found."))
         );
     }
 
@@ -131,37 +165,36 @@ public class TeamService {
     }
 
     private List<TeamPokemonEntity> createTeamMembers(UserTeamEntity team, List<TeamPokemonRequestDto> pokemons) {
-        var abilities = abilityRepository.findAllById(
+        final var abilities = abilityRepository.findAllById(
                 pokemons.stream().map(TeamPokemonRequestDto::pkAbility).filter(Objects::nonNull).toList()
         ).stream().collect(Collectors.toMap(AbilityEntity::getPkAbility, Function.identity()));
 
-        var natures = natureRepository.findAllById(
+        final var natures = natureRepository.findAllById(
                 pokemons.stream().map(TeamPokemonRequestDto::pkNature).filter(Objects::nonNull).toList()
         ).stream().collect(Collectors.toMap(NatureEntity::getPkNature, Function.identity()));
 
-        var pokemonMap = pokemonRepository.findAllById(
+        final var pokemonMap = pokemonRepository.findAllById(
                 pokemons.stream().map(TeamPokemonRequestDto::pkPokemon).toList()
         ).stream().collect(Collectors.toMap(PokemonEntity::getPkPokemon, Function.identity()));
 
         return IntStream.range(0, pokemons.size())
                 .mapToObj(i -> {
-                    var dto = pokemons.get(i);
-                    var pokemon = Optional.ofNullable(pokemonMap.get(dto.pkPokemon()))
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pokemon not found with id: " + dto.pkPokemon()));
-
-                    var ability = dto.pkAbility() == null ? null : Optional.ofNullable(abilities.get(dto.pkAbility()))
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ability not found with id: " + dto.pkAbility()));
-
-                    var nature = dto.pkNature() == null ? null : Optional.ofNullable(natures.get(dto.pkNature()))
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nature not found with id: " + dto.pkNature()));
-
-                    var memberId = new TeamPokemonEntityPK(team.getPkUserTeam(), (short) (i + 1));
-                    var member = new TeamPokemonEntity();
-                    member.setId(memberId);
+                    final var dto = pokemons.get(i);
+                    final var member = new TeamPokemonEntity();
                     member.setTeam(team);
-                    member.setPokemon(pokemon);
-                    member.setAbility(ability);
-                    member.setNature(nature);
+                    member.setTeamMember((short) (i + 1));
+                    member.setPokemon(
+                            Optional.ofNullable(pokemonMap.get(dto.pkPokemon()))
+                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pokemon not found with id: " + dto.pkPokemon()))
+                    );
+                    member.setAbility(dto.pkAbility() == null ? null :
+                            Optional.ofNullable(abilities.get(dto.pkAbility()))
+                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ability not found with id: " + dto.pkAbility()))
+                    );
+                    member.setNature(dto.pkNature() == null ? null :
+                            Optional.ofNullable(natures.get(dto.pkNature()))
+                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nature not found with id: " + dto.pkNature()))
+                    );
                     return member;
                 }).toList();
     }

@@ -34,4 +34,17 @@ public class PokemonEntity {
     private String spriteRef;
     @OneToMany(mappedBy = "pokemon", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<PokemonTypeEntity> pokemonTypes;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PokemonEntity that = (PokemonEntity) o;
+        return getPkPokemon() == that.getPkPokemon() && getIndex() == that.getIndex() && getHeight() == that.getHeight() && getWeight() == that.getWeight() && getBaseExperience() == that.getBaseExperience() && Objects.equals(getName(), that.getName()) && Objects.equals(getSpriteRef(), that.getSpriteRef()) && Objects.equals(getPokemonTypes(), that.getPokemonTypes());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPkPokemon(), getIndex(), getName(), getHeight(), getWeight(), getBaseExperience(), getSpriteRef(), getPokemonTypes());
+    }
 }

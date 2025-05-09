@@ -3,8 +3,6 @@ package com.pkmteam.backend.db.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Objects;
-
 @Data
 @Entity
 @Table(name = "global_configuration", schema = "public", catalog = "postgres")

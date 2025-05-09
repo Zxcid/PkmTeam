@@ -156,12 +156,14 @@ CREATE TABLE public.type_no_damage_to
 
 CREATE TABLE public.team_pokemon
 (
-    fk_user_team INTEGER  NOT NULL,
-    fk_pokemon   INTEGER  NOT NULL,
-    fk_nature    INTEGER  NULL,
-    fk_ability   INTEGER  NULL,
-    team_member  SMALLINT NOT NULL CHECK (team_member BETWEEN 1 AND 6),
-    PRIMARY KEY (fk_user_team, team_member),
+    pk_team_pokemon INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    fk_user_team    INTEGER  NOT NULL,
+    fk_pokemon      INTEGER  NOT NULL,
+    fk_nature       INTEGER  NULL,
+    fk_ability      INTEGER  NULL,
+    team_member     SMALLINT NOT NULL CHECK (team_member BETWEEN 1 AND 6),
+
+    UNIQUE (fk_user_team, team_member),
     FOREIGN KEY (fk_user_team) REFERENCES public.user_team (pk_user_team) ON DELETE CASCADE,
     FOREIGN KEY (fk_pokemon) REFERENCES public.pokemon (pk_pokemon),
     FOREIGN KEY (fk_nature) REFERENCES public.nature (pk_nature),

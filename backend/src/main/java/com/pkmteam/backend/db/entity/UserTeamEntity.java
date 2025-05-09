@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -41,4 +42,17 @@ public class UserTeamEntity {
 
     @OneToMany(mappedBy = "team", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamPokemonEntity> teamMembers;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserTeamEntity that = (UserTeamEntity) o;
+        return getPkUserTeam() == that.getPkUserTeam() && Objects.equals(getName(), that.getName()) && Objects.equals(getUser(), that.getUser()) && Objects.equals(getCreatedAt(), that.getCreatedAt()) && Objects.equals(getTeamMembers(), that.getTeamMembers());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPkUserTeam(), getName(), getUser(), getCreatedAt(), getTeamMembers());
+    }
 }

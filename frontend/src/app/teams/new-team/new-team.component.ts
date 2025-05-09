@@ -176,7 +176,6 @@ export class NewTeamComponent implements OnInit, OnDestroy {
     this.spinner.show(ESpinnerType.PIKA);
     this.teamService.getUserTeamById(+id!)
       .pipe(
-        tap((team) => console.log('team: ', team)),
         finalize(() => this.spinner.hide())
       )
       .subscribe((team: ITeamDto) => this.patchValueToForm(team));
@@ -188,6 +187,7 @@ export class NewTeamComponent implements OnInit, OnDestroy {
     this.teamForm.patchValue({ teamName: name });
 
     teamMembers.forEach(tm => {
+      console.log('tm: ', tm);
       const pkmForm = this.fb.group({
         pkPokemon: [tm.pokemon?.pkPokemon],
         name: [tm.pokemon?.name],

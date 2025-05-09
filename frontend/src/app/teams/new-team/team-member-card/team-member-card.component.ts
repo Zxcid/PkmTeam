@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { filter } from 'rxjs';
 import { ITeamPokemon } from 'src/app/shared/constants/team.model';
 import { EditMemberDialogComponent } from './edit-member-dialog/edit-member-dialog.component';
 
@@ -21,7 +22,6 @@ export class TeamMemberCardComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('control value: ', this.form.value);
   }
 
   onEditPokemon(): void {
@@ -33,11 +33,14 @@ export class TeamMemberCardComponent implements OnInit {
       data: { teamPokemon }
     })
       .afterClosed()
+      .pipe(
+        filter(resp => !!resp)
+      )
       .subscribe((resp) => {
         const { nature, ability } = resp;
-        this.form.get('nature')?.patchValue(nature);
-        this.form.get('ability')?.patchValue(ability);
-        console.log('new control value: ', this.form.value);
+        this.form.get('nature')?.setValue(nature);
+        this.form.get('ability')?.setValue(ability);
+        this.form.markAsDirty();
       });
   }
 

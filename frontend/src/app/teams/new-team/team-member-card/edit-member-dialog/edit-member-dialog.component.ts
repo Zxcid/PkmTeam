@@ -31,6 +31,9 @@ export class EditMemberDialogComponent implements OnInit {
   ngOnInit(): void {
     this.createForm();
     this.populateDropdowns();
+
+    if (this.data.teamPokemon.ability || this.data.teamPokemon.nature)
+      this.patchValueToForm();
   }
 
   onSubmit(): void {
@@ -49,6 +52,15 @@ export class EditMemberDialogComponent implements OnInit {
   private populateDropdowns(): void {
     this.abilityList = this.pokemonService.getAllAbilities();
     this.natureList = this.pokemonService.getAllNatures();
+  }
+
+  private patchValueToForm(): void {
+    const patched = {
+      nature: this.data.teamPokemon.nature || null,
+      ability: this.data.teamPokemon.ability || null
+    };
+
+    this.pokemonDetailForm.patchValue(patched);
   }
 
 }
